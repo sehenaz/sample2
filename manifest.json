@@ -1,0 +1,19 @@
+{
+  "name": "MEVTENCIA - Mevrick Solution",
+  "short_name": "MEVTENCIA",
+  "description": "Pan India Attendance Tracking System by Mevrick Solution Pvt. Ltd.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0A0F1E",
+  "theme_color": "#0A0F1E",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    { "name": "Employee Login", "url": "./mev.html", "description": "Camera login for attendance" },
+    { "name": "Admin Dashboard", "url": "./AdminLogin.html", "description": "Admin attendance monitor" }
+  ]
+}

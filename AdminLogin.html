@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#3f51b5"/>
+  <title>MEVTENCIA — Admin Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    .navbar {
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { color: #111827; font-size: 18px; font-weight: 800; text-decoration: none; }
+    .nav-links { display: flex; gap: 10px; list-style: none; }
+    .nav-links a {
+      color: #3f51b5; text-decoration: none; font-size: 13px; font-weight: 700;
+      padding: 10px 12px; border-radius: 12px; transition: background 0.12s;
+    }
+    .nav-links a:hover { background: rgba(63,81,181,0.08); }
+
+    .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 30px 20px; }
+
+    .login-wrapper { text-align: center; width: 100%; max-width: 450px; }
+
+    .header-section { margin-bottom: 30px; }
+    .admin-icon {
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, #3f51b5, #2c3e9e);
+      border-radius: 18px; display: inline-flex; align-items: center;
+      justify-content: center; margin-bottom: 18px;
+      box-shadow: 0 12px 26px rgba(63,81,181,0.3);
+    }
+    .admin-icon svg { width: 35px; height: 35px; fill: white; }
+    .title { font-size: 28px; color: rgba(255,255,255,0.98); font-weight: 800; margin-bottom: 8px; }
+    .subtitle { color: rgba(255,255,255,0.85); font-size: 14px; }
+
+    .login-card {
+      background: white; border-radius: 20px; padding: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    .form-group { margin-bottom: 22px; text-align: left; }
+    .form-group label { display: block; color: #333; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    .input-wrapper { position: relative; }
+    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: #aaa; }
+    .form-control {
+      width: 100%; padding: 14px 14px 14px 44px;
+      border: 2px solid #e0e0e0; border-radius: 10px;
+      font-size: 15px; transition: all 0.2s; outline: none; min-height: 50px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .form-control:focus { border-color: #5c6bc0; box-shadow: 0 0 0 3px rgba(92,107,192,0.1); }
+    .form-control::placeholder { color: #aaa; }
+
+    .login-btn {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+      color: white; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; min-height: 50px;
+    }
+    .login-btn:hover { box-shadow: 0 10px 25px rgba(63,81,181,0.35); transform: translateY(-1px); }
+    .login-btn:active { transform: scale(0.99); }
+
+    .msg { margin-top: 14px; padding: 12px 15px; border-radius: 12px; font-size: 13px; display: none; }
+    .msg.show { display: block; animation: pop 0.18s ease-out; }
+    @keyframes pop { from { transform: translateY(-6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+    .hint-box {
+      margin-top: 16px; background: #f5f7fa; border-radius: 10px;
+      padding: 12px 15px; font-size: 12px; color: #666; text-align: left; line-height: 1.6;
+    }
+    .hint-box strong { color: #3f51b5; }
+
+    footer { text-align: center; padding: 20px; color: rgba(255,255,255,0.8); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="logo" href="index.html">MEVTENCIA</a>
+    <ul class="nav-links">
+      <li><a href="index.html">← Home</a></li>
+      <li><a href="mev.html">Employee</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="login-wrapper">
+      <div class="header-section">
+        <div class="admin-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </div>
+        <h1 class="title">MEVTENCIA Admin</h1>
+        <p class="subtitle">Secure Access to Admin Management System</p>
+      </div>
+
+      <div class="login-card">
+        <div class="form-group">
+          <label>Admin ID</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <input type="text" class="form-control" id="adminId" placeholder="Enter Admin ID" autocomplete="off"/>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <input type="password" class="form-control" id="password" placeholder="••••••••" autocomplete="current-password"/>
+          </div>
+        </div>
+
+        <button class="login-btn" onclick="doAdminLogin()">🔐 Secure Login</button>
+        <div class="msg error" id="msgErr"></div>
+        <div class="msg success" id="msgOk"></div>
+
+        <div class="hint-box">
+          <strong>Default credentials:</strong> Admin ID: <strong>admin</strong> · Password: <strong>mevrick2026</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2026 MEVTENCIA · Mevrick Solution Pvt. Ltd. · Admin Access</footer>
+
+  <script>
+    const ADMIN = { id: 'admin', password: 'mevrick2026' };
+
+    function showMsg(id, msg) {
+      const el = document.getElementById(id); el.textContent = msg; el.classList.add('show');
+    }
+    function hideMsg(id) { const el = document.getElementById(id); el.classList.remove('show'); el.textContent = ''; }
+
+    function doAdminLogin() {
+      hideMsg('msgErr'); hideMsg('msgOk');
+      const id = document.getElementById('adminId').value.trim();
+      const pw = document.getElementById('password').value;
+      if (!id || !pw) { showMsg('msgErr', '⚠️ Please fill in all fields.'); return; }
+      if (id !== ADMIN.id || pw !== ADMIN.password) { showMsg('msgErr', '❌ Invalid Admin ID or Password.'); return; }
+      localStorage.setItem('mev_adminSession', JSON.stringify({ type:'admin', id, loginAt: new Date().toISOString() }));
+      showMsg('msgOk', '✅ Login successful! Redirecting...');
+      setTimeout(() => window.location.href = 'AdminDashboard.html', 800);
+    }
+
+    document.addEventListener('keypress', e => { if (e.key === 'Enter') doAdminLogin(); });
+  </script>
+</body>
+</html>

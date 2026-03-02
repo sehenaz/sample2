@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#3f51b5"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="MEVTENCIA"/>
+  <title>MEVTENCIA — Mevrick Solution Pvt. Ltd.</title>
+  <link rel="manifest" href="manifest.json"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background-color: #3f51b5;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { color: white; font-size: 20px; font-weight: 800; text-decoration: none; }
+    .nav-time { color: rgba(255,255,255,0.85); font-size: 13px; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 999px; }
+
+    .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 50px; }
+
+    .hero-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    .hero-card .brand-icon {
+      width: 70px; height: 70px; border-radius: 18px;
+      background: linear-gradient(135deg, #3f51b5, #2c3e9e);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 20px rgba(63,81,181,0.3);
+    }
+    .hero-card .brand-icon svg { width: 36px; height: 36px; fill: white; }
+    .hero-card h1 { color: #3f51b5; font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .hero-card p { color: #666; font-size: 14px; }
+
+    .install-banner {
+      display: none;
+      background: white;
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+      border-left: 4px solid #3f51b5;
+    }
+    .install-banner.show { display: block; }
+    .install-banner h4 { color: #3f51b5; font-size: 14px; margin-bottom: 6px; }
+    .install-banner p { color: #666; font-size: 12px; margin-bottom: 12px; }
+    .install-btn {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+      color: white; font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+
+    .menu-grid { display: flex; flex-direction: column; gap: 14px; }
+
+    .menu-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .menu-card:hover, .menu-card:active { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+
+    .menu-icon {
+      width: 54px; height: 54px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .menu-icon svg { width: 28px; height: 28px; fill: white; }
+    .icon-emp { background: linear-gradient(135deg, #4caf50, #388e3c); }
+    .icon-track { background: linear-gradient(135deg, #3f51b5, #2c3e9e); }
+    .icon-admin { background: linear-gradient(135deg, #f44336, #c62828); }
+
+    .menu-body { flex: 1; }
+    .menu-body h3 { color: #333; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .menu-body p { color: #888; font-size: 12px; line-height: 1.4; }
+    .menu-arrow { color: #ccc; font-size: 22px; }
+
+    .rules-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      margin-top: 20px;
+    }
+    .rules-card h4 { color: #3f51b5; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+    .rules-card ul { list-style: none; }
+    .rules-card li { font-size: 13px; color: #555; padding: 5px 0; padding-left: 20px; position: relative; border-bottom: 1px solid #f0f0f0; }
+    .rules-card li:last-child { border-bottom: none; }
+    .rules-card li::before { content: '→'; position: absolute; left: 0; color: #3f51b5; font-weight: 700; }
+
+    footer { text-align: center; padding: 20px; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">MEVTENCIA</div>
+    <div class="nav-time" id="liveTime">--:--</div>
+  </nav>
+
+  <div class="container">
+
+    <div class="hero-card">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M10 2h4a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h3V4a2 2 0 0 1 2-2zm4 6V4h-4v4h4z"/></svg>
+      </div>
+      <h1>MEVTENCIA</h1>
+      <p>Mevrick Solution Pvt. Ltd. — Pan India Attendance System</p>
+    </div>
+
+    <div class="install-banner" id="installBanner">
+      <h4>📱 Install App</h4>
+      <p>Add to your home screen for native app experience — faster, offline-ready.</p>
+      <button class="install-btn" id="installBtn">Add to Home Screen</button>
+    </div>
+
+    <div class="menu-grid">
+      <a class="menu-card" href="mev.html">
+        <div class="menu-icon icon-emp">
+          <svg viewBox="0 0 24 24"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm9-3h-3.17l-1.24-1.35A2 2 0 0 0 15.12 4H8.88a2 2 0 0 0-1.47.65L6.17 6H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2Zm-9 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"/></svg>
+        </div>
+        <div class="menu-body">
+          <h3>Employee Login</h3>
+          <p>Capture photo + GPS location for verified attendance</p>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="AttendanceTracker.html">
+        <div class="menu-icon icon-track">
+          <svg viewBox="0 0 24 24"><path d="M7 11h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V9h14v11z"/></svg>
+        </div>
+        <div class="menu-body">
+          <h3>Attendance Tracker</h3>
+          <p>View your clock-in/out history and work hours</p>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+
+      <a class="menu-card" href="AdminLogin.html">
+        <div class="menu-icon icon-admin">
+          <svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </div>
+        <div class="menu-body">
+          <h3>Admin Portal</h3>
+          <p>Monitor all employee attendance across Pan India</p>
+        </div>
+        <div class="menu-arrow">›</div>
+      </a>
+    </div>
+
+    <div class="rules-card">
+      <h4>⚡ Attendance Rules</h4>
+      <ul>
+        <li>Clock-in after 11:30 AM = Half Day</li>
+        <li>Clock-out before 4:30 PM = Half Day</li>
+        <li>Auto clock-out after 8 hours of work</li>
+        <li>Photo + GPS required for every login</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <footer>© 2026 MEVTENCIA · Mevrick Solution Pvt. Ltd.</footer>
+
+  <script>
+    function tick() {
+      const now = new Date();
+      document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+    tick(); setInterval(tick, 1000);
+
+    let deferredPrompt = null;
+    const banner = document.getElementById('installBanner');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault(); deferredPrompt = e;
+      if (!isStandalone) banner.classList.add('show');
+    });
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null; banner.classList.remove('show');
+    });
+    window.addEventListener('appinstalled', () => banner.classList.remove('show'));
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+  </script>
+</body>
+</html>
