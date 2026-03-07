@@ -131,10 +131,10 @@
         <button class="login-btn" onclick="doAdminLogin()">🔐 Secure Login</button>
         <div class="msg error" id="msgErr"></div>
         <div class="msg success" id="msgOk"></div>
-
+<!-- 
         <div class="hint-box">
           <strong>Default credentials:</strong> Admin ID: <strong>admin</strong> · Password: <strong>mevrick2026</strong>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -142,7 +142,7 @@
   <footer>© 2026 MEVTENCIA · Mevrick Solution Pvt. Ltd. · Admin Access</footer>
 
   <script>
-    const ADMIN = { id: 'admin', password: 'mevrick2026' };
+    const ADMIN = { id: 'admin', password: 'admin@2026' };
 
     function showMsg(id, msg) {
       const el = document.getElementById(id); el.textContent = msg; el.classList.add('show');

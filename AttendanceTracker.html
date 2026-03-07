@@ -1,164 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#3f51b5"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#3f51b5" />
   <title>MEVTENCIA — Attendance Tracker</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
       min-height: 100vh;
     }
+
     .navbar {
       background-color: #3f51b5;
       padding: 14px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    .logo { color: white; font-size: 20px; font-weight: 800; text-decoration: none; }
-    .nav-right { display: flex; align-items: center; gap: 10px; }
-    .nav-links { list-style: none; display: flex; gap: 8px; }
-    .nav-links a {
-      color: white; text-decoration: none; font-size: 12px;
-      padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,0.12);
+
+    .logo {
+      color: white;
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: none;
     }
 
-    .container { max-width: 700px; margin: 0 auto; padding: 25px 18px 60px; }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 25px 18px 60px;
+    }
 
     /* Profile bar */
     .profile-bar {
       background: white;
       border-radius: 16px;
       padding: 18px 20px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
       margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 15px;
     }
+
     .profile-img {
-      width: 56px; height: 56px; border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
       background: linear-gradient(135deg, #3f51b5, #2c3e9e);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; border: 3px solid #e0e7ff; flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 3px solid #e0e7ff;
+      flex-shrink: 0;
     }
-    .profile-img img { width: 100%; height: 100%; object-fit: cover; }
-    .profile-img svg { width: 28px; height: 28px; fill: white; }
-    .profile-info { flex: 1; }
-    .profile-info h3 { color: #333; font-size: 16px; font-weight: 700; margin-bottom: 2px; }
-    .profile-info p { color: #888; font-size: 12px; }
-    .profile-location { font-size: 12px; color: #3f51b5; background: #e8eef5; padding: 4px 10px; border-radius: 20px; margin-top: 5px; display: inline-block; }
+
+    .profile-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-img svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-info h3 {
+      color: #333;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .profile-info p {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .profile-location {
+      font-size: 12px;
+      color: #3f51b5;
+      background: #e8eef5;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-top: 5px;
+      display: inline-block;
+    }
 
     /* Clock section */
     .clock-section {
       background: white;
       border-radius: 20px;
       padding: 25px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
       text-align: center;
     }
-    .clock-section h3 { color: #3f51b5; margin-bottom: 15px; font-size: 16px; font-weight: 700; }
-    .date-display { font-size: 15px; color: #666; margin-bottom: 6px; }
-    .time-display {
-      font-size: 46px; color: #3f51b5; font-weight: bold;
-      margin-bottom: 8px; font-family: 'Courier New', monospace; line-height: 1;
-    }
-    .shift-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; margin-bottom: 18px;
-    }
-    .shift-normal { background: #d4edda; color: #155724; }
-    .shift-half { background: #fff3cd; color: #856404; }
-    .shift-dot { width: 7px; height: 7px; border-radius: 50%; animation: blink 1.5s infinite; }
-    .dot-green { background: #28a745; }
-    .dot-amber { background: #ffc107; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 
-    .clock-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      padding: 14px 35px; border: none; border-radius: 10px;
-      font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    .clock-section h3 {
+      color: #3f51b5;
+      margin-bottom: 15px;
+      font-size: 16px;
+      font-weight: 700;
     }
-    .btn-in { background: linear-gradient(135deg, #4caf50, #45a049); color: white; }
-    .btn-out { background: linear-gradient(135deg, #f44336, #da190b); color: white; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .date-display {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .time-display {
+      font-size: 46px;
+      color: #3f51b5;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-family: 'Courier New', monospace;
+      line-height: 1;
+    }
+
+    .shift-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+    }
+
+    .shift-normal {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .shift-half {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .shift-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    .dot-green {
+      background: #28a745;
+    }
+
+    .dot-amber {
+      background: #ffc107;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .clock-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 35px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-in {
+      background: linear-gradient(135deg, #4caf50, #45a049);
+      color: white;
+    }
+
+    .btn-out {
+      background: linear-gradient(135deg, #f44336, #da190b);
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
     /* Auto timer */
     .auto-timer {
-      background: #e8eef5; border: 1px solid #c5cee0; border-radius: 12px;
-      padding: 12px 16px; margin-top: 15px; display: none;
-      align-items: center; gap: 12px; text-align: left; font-size: 13px; color: #555;
+      background: #e8eef5;
+      border: 1px solid #c5cee0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-top: 15px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      font-size: 13px;
+      color: #555;
     }
-    .auto-timer.show { display: flex; }
-    .auto-timer strong { color: #3f51b5; font-size: 16px; font-family: 'Courier New', monospace; }
+
+    .auto-timer.show {
+      display: flex;
+    }
+
+    .auto-timer strong {
+      color: #3f51b5;
+      font-size: 16px;
+      font-family: 'Courier New', monospace;
+    }
 
     /* Today status */
     .status-card {
       background: white;
       border-radius: 20px;
       padding: 25px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
-    .status-card h3 { color: #3f51b5; margin-bottom: 18px; font-size: 16px; font-weight: 700; }
-    .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .status-item {
-      background: #f5f7fa; padding: 16px; border-radius: 12px; text-align: center;
+
+    .status-card h3 {
+      color: #3f51b5;
+      margin-bottom: 18px;
+      font-size: 16px;
+      font-weight: 700;
     }
-    .status-item label { display: block; color: #888; font-size: 12px; margin-bottom: 8px; }
-    .status-item .value { font-size: 22px; font-weight: bold; color: #3f51b5; }
-    .badge-full { font-size: 11px; font-weight: 700; background: #d4edda; color: #155724; padding: 3px 10px; border-radius: 10px; display: inline-block; margin-top: 4px; }
-    .badge-half { font-size: 11px; font-weight: 700; background: #fff3cd; color: #856404; padding: 3px 10px; border-radius: 10px; display: inline-block; margin-top: 4px; }
-    .badge-live { font-size: 11px; font-weight: 700; background: #cce5ff; color: #004085; padding: 3px 10px; border-radius: 10px; display: inline-block; margin-top: 4px; }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .status-item {
+      background: #f5f7fa;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .status-item label {
+      display: block;
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .status-item .value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #3f51b5;
+    }
+
+    .badge-full {
+      font-size: 11px;
+      font-weight: 700;
+      background: #d4edda;
+      color: #155724;
+      padding: 3px 10px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .badge-half {
+      font-size: 11px;
+      font-weight: 700;
+      background: #fff3cd;
+      color: #856404;
+      padding: 3px 10px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .badge-live {
+      font-size: 11px;
+      font-weight: 700;
+      background: #cce5ff;
+      color: #004085;
+      padding: 3px 10px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 4px;
+    }
 
     /* Summary cards */
-    .summary-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
-    .sum-card { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); text-align: center; }
-    .sum-card .num { font-size: 30px; font-weight: bold; color: #3f51b5; margin-bottom: 6px; }
-    .sum-card .lbl { color: #888; font-size: 12px; }
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .sum-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .sum-card .num {
+      font-size: 30px;
+      font-weight: bold;
+      color: #3f51b5;
+      margin-bottom: 6px;
+    }
+
+    .sum-card .lbl {
+      color: #888;
+      font-size: 12px;
+    }
 
     /* History table */
     .attendance-table {
       background: white;
       border-radius: 20px;
       padding: 25px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
       overflow-x: auto;
     }
-    .attendance-table h3 { color: #3f51b5; margin-bottom: 18px; font-size: 16px; font-weight: 700; }
-    table { width: 100%; border-collapse: collapse; min-width: 500px; }
-    th { background: #3f51b5; color: white; padding: 12px 14px; text-align: left; font-weight: 600; font-size: 13px; }
-    td { padding: 12px 14px; border-bottom: 1px solid #e0e7ff; font-size: 13px; }
-    tr:hover { background: #f5f7fa; }
-    tr:last-child td { border-bottom: none; }
 
-    .status-present { color: #4caf50; font-weight: 600; }
-    .status-half { color: #ff9800; font-weight: 600; }
-    .status-wip { color: #3f51b5; font-weight: 600; }
+    .attendance-table h3 {
+      color: #3f51b5;
+      margin-bottom: 18px;
+      font-size: 16px;
+      font-weight: 700;
+    }
 
-    .empty-msg { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+
+    th {
+      background: #3f51b5;
+      color: white;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e0e7ff;
+      font-size: 13px;
+    }
+
+    tr:hover {
+      background: #f5f7fa;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-present {
+      color: #4caf50;
+      font-weight: 600;
+    }
+
+    .status-half {
+      color: #ff9800;
+      font-weight: 600;
+    }
+
+    .status-wip {
+      color: #3f51b5;
+      font-weight: 600;
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 30px;
+      color: #aaa;
+      font-size: 14px;
+    }
 
     /* Toast */
     .toast {
-      position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px);
-      background: #333; color: white; padding: 12px 22px; border-radius: 25px;
-      font-size: 14px; z-index: 999; transition: transform 0.3s; white-space: nowrap;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: white;
+      padding: 12px 22px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 999;
+      transition: transform 0.3s;
+      white-space: nowrap;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
     }
-    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
+
 <body>
   <nav class="navbar">
     <a class="logo" href="index.html">MEVTENCIA</a>
@@ -175,7 +486,10 @@
     <!-- Profile bar -->
     <div class="profile-bar">
       <div class="profile-img" id="profileImg">
-        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
       </div>
       <div class="profile-info">
         <h3 id="empName">Employee</h3>
@@ -231,10 +545,22 @@
 
     <!-- Summary -->
     <div class="summary-row">
-      <div class="sum-card"><div class="num" id="sumTotal">0</div><div class="lbl">Total Days</div></div>
-      <div class="sum-card"><div class="num" id="sumPresent">0</div><div class="lbl">Present Days</div></div>
-      <div class="sum-card"><div class="num" id="sumHalf">0</div><div class="lbl">Half Days</div></div>
-      <div class="sum-card"><div class="num" id="sumHours">0h</div><div class="lbl">Total Hours</div></div>
+      <div class="sum-card">
+        <div class="num" id="sumTotal">0</div>
+        <div class="lbl">Total Days</div>
+      </div>
+      <div class="sum-card">
+        <div class="num" id="sumPresent">0</div>
+        <div class="lbl">Present Days</div>
+      </div>
+      <div class="sum-card">
+        <div class="num" id="sumHalf">0</div>
+        <div class="lbl">Half Days</div>
+      </div>
+      <div class="sum-card">
+        <div class="num" id="sumHours">0h</div>
+        <div class="lbl">Total Hours</div>
+      </div>
     </div>
 
     <!-- Attendance History -->
@@ -267,12 +593,12 @@
     let session = null;
     let clockInTime = null;
 
-    window.onload = function() {
+    window.onload = async function () {
       session = JSON.parse(localStorage.getItem('mev_session') || 'null');
       if (!session || session.type !== 'employee') { window.location.href = 'index.html'; return; }
 
       document.getElementById('empName').textContent = session.name;
-      document.getElementById('empMeta').textContent = session.id + ' · ' + session.dept + ' · ' + session.city;
+      document.getElementById('empMeta').textContent = session.id + ' · ' + (session.dept || 'Employee') + ' · ' + session.city;
 
       const photo = localStorage.getItem('mev_capturedPhoto');
       if (photo) {
@@ -288,18 +614,94 @@
             document.getElementById('empLocation').textContent = '📍 ' + d.address;
             document.getElementById('empLocation').style.display = 'inline-block';
           }
-        } catch(e) {}
+        } catch (e) { }
       }
 
       setInterval(tickClock, 1000); tickClock();
+
+      // INITIALIZE LOCAL STATE IMMEDIATELY
       loadTodayState();
       renderHistory();
       updateSummary();
+
+      // AUTO CLOCK IN LOGIC:
+      // If we have a fresh photo capture and no clock-in for today, do it automatically.
+      const captureAt = localStorage.getItem('mev_captureAt');
+      const rec = getRecord();
+      if (photo && captureAt && !rec) {
+        const captureTime = new Date(captureAt);
+        if ((Date.now() - captureTime.getTime()) / 60000 < 30) {
+          console.log("Auto clocking in using capture time...");
+          doClockin(captureTime);
+        }
+      }
+
+      // LOAD FROM BACKEND IN BACKGROUND (non-blocking)
+      (async () => {
+        try {
+          const backendRecords = await getRecordsFromBackend();
+          if (backendRecords && Array.isArray(backendRecords) && backendRecords.length > 0) {
+            // Merge logic: prefer backend records but keep local ones if they aren't on backend yet
+            const localRecords = getRecords();
+            const merged = [...backendRecords];
+            localRecords.forEach(lr => {
+              if (lr && lr.date && !merged.find(br => br.date === lr.date)) {
+                merged.push(lr);
+              }
+            });
+            // Safety sort by date descending
+            merged.sort((a, b) => {
+              if (!a.date || !b.date) return 0;
+              const da = a.date.includes('/') ? a.date.split('/').reverse().join('') : a.date;
+              const db = b.date.includes('/') ? b.date.split('/').reverse().join('') : b.date;
+              return db.localeCompare(da);
+            });
+            localStorage.setItem(getKey(), JSON.stringify(merged));
+            renderHistory();
+            updateSummary();
+          }
+        } catch (e) {
+          console.warn('Background sync failed:', e);
+        }
+      })();
     };
+
+    async function getRecordsFromBackend() {
+      const response = await fetch(`/api/attendance/${session.id}`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      return await response.json();
+    }
+
+    async function syncToBackend(record) {
+      if (!record) return;
+      try {
+        const data = {
+          emp_id: session.id,
+          emp_name: session.name,
+          dept: session.dept || 'Employee',
+          city: session.city,
+          date: record.date,
+          clock_in: record.clock_in,
+          clock_out: record.clock_out || '',
+          work_hours: record.work_hours || '',
+          attendance_type: record.attendance_type || 'In Progress',
+          location: record.location,
+          photo: record.photo
+        };
+        const response = await fetch('/api/attendance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        return await response.json();
+      } catch (e) {
+        console.error('Sync failed:', e);
+      }
+    }
 
     function getToday() {
       const d = new Date();
-      return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+      return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
     }
 
     function fmtTimeShort(d) {
@@ -314,7 +716,7 @@
     function tickClock() {
       const now = new Date();
       document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-IN', { hour12: false });
-      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
       const h = now.getHours(), m = now.getMinutes();
       const lateIn = h > HALF_IN_H || (h === HALF_IN_H && m >= HALF_IN_M);
@@ -334,39 +736,51 @@
         if (diff >= SHIFT_MS) { doClockout(true); return; }
         // Countdown
         const rem = SHIFT_MS - diff;
-        const rh = Math.floor(rem/3600000), rm = Math.floor((rem%3600000)/60000), rs = Math.floor((rem%60000)/1000);
-        document.getElementById('autoCountdown').textContent = `${String(rh).padStart(2,'0')}:${String(rm).padStart(2,'0')}:${String(rs).padStart(2,'0')}`;
+        const rh = Math.floor(rem / 3600000), rm = Math.floor((rem % 3600000) / 60000), rs = Math.floor((rem % 60000) / 1000);
+        document.getElementById('autoCountdown').textContent = `${String(rh).padStart(2, '0')}:${String(rm).padStart(2, '0')}:${String(rs).padStart(2, '0')}`;
       }
     }
 
     function getKey() { return `mev_att_${session.id}`; }
     function getRecords() { return JSON.parse(localStorage.getItem(getKey()) || '[]'); }
-    function saveRecords(recs) {
+    function saveRecords(recs, syncIdx = 0) {
       localStorage.setItem(getKey(), JSON.stringify(recs));
       pushToAdminLog(recs);
+      // Sync the specific record to backend
+      if (recs.length > syncIdx) {
+        syncToBackend(recs[syncIdx]);
+      }
     }
     function getRecord() { return getRecords().find(r => r.date === getToday()) || null; }
 
     function pushToAdminLog(recs) {
       const all = JSON.parse(localStorage.getItem('mev_adminLog') || '[]');
-      const filtered = all.filter(r => r.emp_id !== session.id);
       const loc = JSON.parse(localStorage.getItem('mev_capturedLocation') || '{}');
       const photo = localStorage.getItem('mev_capturedPhoto') || '';
+
       recs.forEach(r => {
-        filtered.push({
+        // Find existing record for this employee and date to update it, otherwise add new
+        const existingIdx = all.findIndex(item => item.emp_id === session.id && item.date === r.date);
+        const recordData = {
           emp_id: session.id, emp_name: session.name, dept: session.dept, city: session.city,
           date: r.date, clock_in: r.clock_in, clock_out: r.clock_out || '',
           work_hours: r.work_hours || '', attendance_type: r.attendance_type || 'In Progress',
-          location: loc.address || 'Unknown', photo
-        });
+          location: loc.address || 'Unknown', photo: photo || r.photo || ''
+        };
+
+        if (existingIdx !== -1) {
+          all[existingIdx] = recordData;
+        } else {
+          all.push(recordData);
+        }
       });
-      localStorage.setItem('mev_adminLog', JSON.stringify(filtered));
+      localStorage.setItem('mev_adminLog', JSON.stringify(all));
     }
 
     function determineType(inTime, outTime) {
       const ih = inTime.getHours(), im = inTime.getMinutes();
       const oh = outTime.getHours(), om = outTime.getMinutes();
-      const lateIn  = ih > HALF_IN_H  || (ih === HALF_IN_H  && im >= HALF_IN_M);
+      const lateIn = ih > HALF_IN_H || (ih === HALF_IN_H && im >= HALF_IN_M);
       const earlyOut = oh < HALF_OUT_H || (oh === HALF_OUT_H && om < HALF_OUT_M);
       return (lateIn || earlyOut) ? 'Half Day' : 'Full Day';
     }
@@ -392,10 +806,10 @@
       }
     }
 
-    function doClockin() {
+    function doClockin(timeOverride = null) {
       const rec = getRecord();
       if (rec) { showToast('Already clocked in today!'); return; }
-      const now = new Date();
+      const now = timeOverride || new Date();
       const ih = now.getHours(), im = now.getMinutes();
       const lateIn = ih > HALF_IN_H || (ih === HALF_IN_H && im >= HALF_IN_M);
       const loc = JSON.parse(localStorage.getItem('mev_capturedLocation') || '{}');
@@ -430,8 +844,10 @@
       rec.attendance_type = type;
       const recs = getRecords();
       const idx = recs.findIndex(r => r.date === getToday());
-      if (idx !== -1) recs[idx] = rec;
-      saveRecords(recs);
+      if (idx !== -1) {
+        recs[idx] = rec;
+        saveRecords(recs, idx);
+      }
       document.getElementById('statOut').textContent = rec.clock_out;
       document.getElementById('statHours').textContent = rec.work_hours;
       setStatusBadge(type);
@@ -458,8 +874,8 @@
       const body = document.getElementById('historyBody');
       const recs = getRecords();
       if (!recs.length) { body.innerHTML = '<tr><td colspan="5" class="empty-msg">No attendance records yet.</td></tr>'; return; }
-      body.innerHTML = recs.slice(0,30).map(r => {
-        const isHalf = (r.attendance_type||'').includes('Half');
+      body.innerHTML = recs.slice(0, 30).map(r => {
+        const isHalf = (r.attendance_type || '').includes('Half');
         const isDone = !!r.clock_out;
         const statusClass = isDone ? (isHalf ? 'status-half' : 'status-present') : 'status-wip';
         const statusText = isDone ? (isHalf ? 'Half Day' : 'Present') : 'In Progress';
@@ -477,15 +893,15 @@
       const recs = getRecords();
       document.getElementById('sumTotal').textContent = recs.length;
       document.getElementById('sumPresent').textContent = recs.filter(r => r.clock_out && r.attendance_type === 'Full Day').length;
-      document.getElementById('sumHalf').textContent = recs.filter(r => (r.attendance_type||'').includes('Half')).length;
+      document.getElementById('sumHalf').textContent = recs.filter(r => (r.attendance_type || '').includes('Half')).length;
       let mins = 0;
       recs.forEach(r => {
         if (r.work_hours) {
           const m = r.work_hours.match(/(\d+)h (\d+)m/);
-          if (m) mins += parseInt(m[1])*60 + parseInt(m[2]);
+          if (m) mins += parseInt(m[1]) * 60 + parseInt(m[2]);
         }
       });
-      document.getElementById('sumHours').textContent = Math.floor(mins/60) + 'h';
+      document.getElementById('sumHours').textContent = Math.floor(mins / 60) + 'h';
     }
 
     let toastTimer;
@@ -502,4 +918,5 @@
     }
   </script>
 </body>
+
 </html>

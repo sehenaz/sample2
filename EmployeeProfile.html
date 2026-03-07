@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#3f51b5"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#3f51b5" />
   <title>MEVTENCIA — Employee Login</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -15,23 +22,41 @@
       flex-direction: column;
       overflow-x: hidden;
     }
+
     .navbar {
-      background: rgba(255,255,255,0.96);
+      background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(10px);
       padding: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    .logo { color: #111827; font-size: 18px; font-weight: 800; text-decoration: none; }
-    .nav-links { display: flex; gap: 10px; list-style: none; }
+
+    .logo {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      list-style: none;
+    }
+
     .nav-links a {
-      color: #3f51b5; text-decoration: none; font-size: 12px; font-weight: 700;
-      padding: 8px 10px; border-radius: 999px; background: rgba(63,81,181,0.08);
+      color: #3f51b5;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(63, 81, 181, 0.08);
     }
 
     .container {
@@ -42,12 +67,15 @@
       padding: 30px 20px;
     }
 
-    .login-wrapper { width: 100%; max-width: 450px; }
+    .login-wrapper {
+      width: 100%;
+      max-width: 450px;
+    }
 
     .profile-card {
       background: white;
       border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
       overflow: hidden;
     }
 
@@ -56,74 +84,213 @@
       padding: 25px 20px;
       text-align: center;
     }
+
     .profile-photo {
-      width: 90px; height: 90px; border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.5);
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.5);
       margin: 0 auto 12px;
       overflow: hidden;
-      background: rgba(255,255,255,0.2);
-      display: flex; align-items: center; justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .profile-photo svg { width: 44px; height: 44px; fill: white; }
-    .card-header h2 { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-    .card-header p { color: rgba(255,255,255,0.8); font-size: 13px; }
+
+    .profile-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-photo svg {
+      width: 44px;
+      height: 44px;
+      fill: white;
+    }
+
+    .card-header h2 {
+      color: white;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-header p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+    }
+
     .verified-tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-      color: white; font-size: 11px; font-weight: 600;
-      padding: 4px 12px; border-radius: 20px; margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 10px;
     }
 
-    .card-body { padding: 30px 25px; }
+    .card-body {
+      padding: 30px 25px;
+    }
 
-    .form-group { margin-bottom: 22px; }
-    .form-group label { display: block; color: #3f51b5; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-    .input-wrapper { position: relative; }
-    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: #aaa; }
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #3f51b5;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: #aaa;
+    }
+
     .form-control {
-      width: 100%; padding: 14px 14px 14px 44px;
-      border: 2px solid #e0e7ff; border-radius: 10px;
-      font-size: 15px; outline: none; transition: border-color 0.2s; min-height: 50px;
+      width: 100%;
+      padding: 14px 14px 14px 44px;
+      border: 2px solid #e0e7ff;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      min-height: 50px;
       font-family: 'Segoe UI', sans-serif;
     }
-    .form-control:focus { border-color: #3f51b5; }
-    .form-control::placeholder { color: #aaa; }
+
+    .form-control:focus {
+      border-color: #3f51b5;
+    }
+
+    .form-control::placeholder {
+      color: #aaa;
+    }
 
     .login-btn {
-      width: 100%; padding: 15px;
+      width: 100%;
+      padding: 15px;
       background: linear-gradient(135deg, #3f51b5, #5c6bc0);
-      color: white; border: none; border-radius: 10px;
-      font-size: 16px; font-weight: 700; cursor: pointer;
-      transition: all 0.2s; min-height: 50px;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 50px;
     }
-    .login-btn:hover { box-shadow: 0 8px 20px rgba(63,81,181,0.35); transform: translateY(-1px); }
-    .login-btn:active { transform: scale(0.99); }
+
+    .login-btn:hover {
+      box-shadow: 0 8px 20px rgba(63, 81, 181, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .login-btn:active {
+      transform: scale(0.99);
+    }
 
     .status-msg {
-      padding: 12px 15px; border-radius: 10px; font-size: 13px;
-      margin-top: 14px; display: none; line-height: 1.5;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-top: 14px;
+      display: none;
+      line-height: 1.5;
     }
-    .status-msg.show { display: block; }
-    .status-msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .status-msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .status-msg.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
-    .hint { margin-top: 16px; font-size: 12px; color: #777; text-align: center; }
-    .hint strong { color: #3f51b5; }
+    .status-msg.show {
+      display: block;
+    }
 
-    .emp-chips { margin-top: 16px; }
-    .emp-chips p { font-size: 12px; color: #888; margin-bottom: 8px; }
-    .chip-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+    .status-msg.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-msg.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status-msg.warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .hint {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+
+    .hint strong {
+      color: #3f51b5;
+    }
+
+    .emp-chips {
+      margin-top: 16px;
+    }
+
+    .emp-chips p {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .chip-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
     .chip {
-      background: #e8eef5; color: #3f51b5; font-size: 12px; font-weight: 600;
-      padding: 5px 12px; border-radius: 999px; cursor: pointer; transition: background 0.15s;
+      background: #e8eef5;
+      color: #3f51b5;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .chip:hover { background: #c5cee0; }
 
-    footer { text-align: center; padding: 18px; color: rgba(255,255,255,0.7); font-size: 12px; }
+    .chip:hover {
+      background: #c5cee0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+    }
   </style>
 </head>
+
 <body>
   <nav class="navbar">
     <a class="logo" href="index.html">MEVTENCIA</a>
@@ -138,7 +305,10 @@
       <div class="profile-card">
         <div class="card-header">
           <div class="profile-photo" id="profilePhoto">
-            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
           </div>
           <h2>Employee Login</h2>
           <p>Enter your credentials to mark attendance</p>
@@ -149,27 +319,33 @@
           <div class="form-group">
             <label>Employee ID</label>
             <div class="input-wrapper">
-              <svg class="input-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-              <input type="text" class="form-control" id="empId" placeholder="e.g. EMP001" autocomplete="off"/>
+              <svg class="input-icon" viewBox="0 0 24 24">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+              <input type="text" class="form-control" id="empId" placeholder="e.g. EMP001" autocomplete="off" />
             </div>
           </div>
           <div class="form-group" style="margin-bottom: 10px;">
             <label>Password</label>
             <div class="input-wrapper">
-              <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-              <input type="password" class="form-control" id="password" placeholder="••••••••"/>
+              <svg class="input-icon" viewBox="0 0 24 24">
+                <path
+                  d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+              </svg>
+              <input type="password" class="form-control" id="password" placeholder="••••••••" />
             </div>
           </div>
 
           <button class="login-btn" onclick="doLogin()">Mark Attendance →</button>
           <div class="status-msg" id="statusMsg"></div>
 
-          <div class="hint">Default password for all employees: <strong>2026</strong></div>
+          <!-- <div class="hint">Default password for all employees: <strong>2026</strong></div> -->
 
-          <div class="emp-chips">
+          <!-- <div class="emp-chips">
             <p>Quick select Employee ID:</p>
             <div class="chip-wrap" id="chipWrap"></div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -180,23 +356,26 @@
   <script>
     // ===== EMPLOYEE DATABASE =====
     const EMPLOYEES = {
-      "EMP001": { id:"EMP001", name:"Aarav Sharma",    dept:"IT",        city:"Mumbai",    password:"2026" },
-      "EMP002": { id:"EMP002", name:"Priya Patel",     dept:"HR",        city:"Delhi",     password:"2026" },
-      "EMP003": { id:"EMP003", name:"Rahul Das",       dept:"Sales",     city:"Kolkata",   password:"2026" },
-      "EMP004": { id:"EMP004", name:"Sunita Rao",      dept:"Finance",   city:"Bangalore", password:"2026" },
-      "EMP005": { id:"EMP005", name:"Vikram Singh",    dept:"Ops",       city:"Chennai",   password:"2026" },
-      "EMP006": { id:"EMP006", name:"Neha Gupta",      dept:"Marketing", city:"Hyderabad", password:"2026" },
-      "EMP007": { id:"EMP007", name:"Amit Kumar",      dept:"IT",        city:"Pune",      password:"2026" },
-      "EMP008": { id:"EMP008", name:"Kavya Nair",      dept:"Design",    city:"Kochi",     password:"2026" },
-      "EMP009": { id:"EMP009", name:"Rajesh Verma",    dept:"Sales",     city:"Jaipur",    password:"2026" },
-      "EMP010": { id:"EMP010", name:"Sehenaz Khatun",  dept:"Admin",     city:"Kolkata",   password:"2026" },
+      "MEV/336/2025": { id: "MEV/336/2025", name: "Sehenaz Khatun", city: "Kolkata", dept: "Operations", password: "MEVRICK1707" },
+      "MEV/340/2026": { id: "MEV/340/2026", name: "Ishika Nayak", city: "Mumbai", dept: "HR", password: "MEVRICK1707" },
+      "MEV/296/2025": { id: "MEV/296/2025", name: "Udita Karmakar", city: "Delhi", dept: "Tech", password: "MEVRICK1707" },
+      "MEV/110/2022": { id: "MEV/110/2022", name: "Indrani Ganguly", city: "Bangalore", dept: "Admin", password: "MEVRICK1707" },
+      "MEV/339/2026": { id: "MEV/339/2026", name: "Sreeparna Biswas", city: "Kolkata", dept: "Sales", password: "MEVRICK1707" },
+      "MEV/322/2025": { id: "MEV/322/2025", name: "Tathagata Roy", city: "Pune", dept: "Design", password: "MEVRICK1707" },
+      "MEV/323/2025": { id: "MEV/323/2025", name: "Swagata Dutta", city: "Kolkata", dept: "Finance", password: "MEVRICK1707" },
+      "MEV/264/2024": { id: "MEV/264/2024", name: "Sumit Naskar", city: "Chennai", dept: "Tech", password: "MEVRICK1707" },
+      "MEV/337/2025": { id: "MEV/337/2025", name: "Adisree Tapader", city: "Hyderabad", dept: "Marketing", password: "MEVRICK1707" },
+      "MEV/259/2024": { id: "MEV/259/2024", name: "Subir Kumar Gosh", city: "Kolkata", dept: "Logistics", password: "MEVRICK1707" },
+      "MEV/316/2025": { id: "MEV/316/2025", name: "Enakshi Ghosh", city: "Ahmedabad", dept: "Legal", password: "MEVRICK1707" },
     };
 
-    window.onload = function() {
+
+
+    window.onload = function () {
       const photo = localStorage.getItem('mev_capturedPhoto');
       if (photo) {
         const img = document.createElement('img'); img.src = photo;
-        const wrap = document.getElementById('profilePhoto'); wrap.innerHTML=''; wrap.appendChild(img);
+        const wrap = document.getElementById('profilePhoto'); wrap.innerHTML = ''; wrap.appendChild(img);
         document.getElementById('verifiedTag').style.display = 'inline-flex';
       }
       const captureAt = localStorage.getItem('mev_captureAt');
@@ -208,14 +387,14 @@
       localStorage.setItem('mev_employeeDB', JSON.stringify(EMPLOYEES));
       const wrap = document.getElementById('chipWrap');
       Object.keys(EMPLOYEES).forEach(id => {
-        const c = document.createElement('span'); c.className='chip'; c.textContent=id;
+        const c = document.createElement('span'); c.className = 'chip'; c.textContent = id;
         c.onclick = () => document.getElementById('empId').value = id;
         wrap.appendChild(c);
       });
     };
 
     function showMsg(msg, type) {
-      const el = document.getElementById('statusMsg'); el.textContent=msg; el.className='status-msg show '+type;
+      const el = document.getElementById('statusMsg'); el.textContent = msg; el.className = 'status-msg show ' + type;
     }
 
     function doLogin() {
@@ -231,7 +410,7 @@
       const emp = EMPLOYEES[empId];
       if (!emp) { showMsg('❌ Employee ID not found. Contact admin.', 'error'); return; }
       if (password !== emp.password) { showMsg('❌ Incorrect password.', 'error'); return; }
-      localStorage.setItem('mev_session', JSON.stringify({ type:'employee', id:emp.id, name:emp.name, dept:emp.dept, city:emp.city, loginAt:new Date().toISOString() }));
+      localStorage.setItem('mev_session', JSON.stringify({ type: 'employee', id: emp.id, name: emp.name, dept: emp.dept, city: emp.city, loginAt: new Date().toISOString() }));
       showMsg('✅ Login successful! Redirecting...', 'success');
       setTimeout(() => window.location.href = 'AttendanceTracker.html', 900);
     }
@@ -239,4 +418,5 @@
     document.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
   </script>
 </body>
+
 </html>
