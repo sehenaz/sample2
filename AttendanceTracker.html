@@ -440,11 +440,21 @@
       font-weight: 600;
     }
 
-    .empty-msg {
-      text-align: center;
-      padding: 30px;
-      color: #aaa;
-      font-size: 14px;
+    .loc-cell {
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+      color: #777;
+    }
+
+    .map-btn {
+      color: #3f51b5;
+      text-decoration: underline;
+      font-size: 10px;
+      display: block;
+      margin-top: 2px;
     }
 
     /* Toast */
@@ -574,6 +584,7 @@
             <th>Clock Out</th>
             <th>Work Hours</th>
             <th>Status</th>
+            <th>Location</th>
           </tr>
         </thead>
         <tbody id="historyBody"></tbody>
@@ -878,18 +889,23 @@
     function renderHistory() {
       const body = document.getElementById('historyBody');
       const recs = getRecords();
-      if (!recs.length) { body.innerHTML = '<tr><td colspan="5" class="empty-msg">No attendance records yet.</td></tr>'; return; }
+      if (!recs.length) { body.innerHTML = '<tr><td colspan="6" class="empty-msg">No attendance records yet.</td></tr>'; return; }
       body.innerHTML = recs.slice(0, 30).map(r => {
         const isHalf = (r.attendance_type || '').includes('Half');
         const isDone = !!r.clock_out;
         const statusClass = isDone ? (isHalf ? 'status-half' : 'status-present') : 'status-wip';
         const statusText = isDone ? (isHalf ? 'Half Day' : 'Present') : 'In Progress';
+        const mapLink = r.lat && r.lng ? `<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank" class="map-btn">Map View</a>` : '';
         return `<tr>
           <td>${r.date}</td>
           <td>${r.clock_in}</td>
           <td>${r.clock_out || '--:--'}</td>
           <td>${r.work_hours || 'In Progress'}</td>
           <td class="${statusClass}">${statusText}</td>
+          <td>
+            <div class="loc-cell" title="${r.location || ''}">${r.location || 'Unknown'}</div>
+            ${mapLink}
+          </td>
         </tr>`;
       }).join('');
     }

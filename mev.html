@@ -228,6 +228,25 @@
       font-family: monospace;
     }
 
+    .loc-verify-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #eef2ff;
+      color: #3f51b5;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .loc-verify-btn:hover {
+      background: #e0e7ff;
+      border-color: #3f51b5;
+    }
+
     .btn-group {
       display: flex;
       gap: 12px;
@@ -357,9 +376,10 @@
         <img id="photo" alt="Captured" />
       </div>
       <div class="location-box" id="locationBox">
-        <strong>📍 Current Location</strong>
-        <div class="location-address" id="locationAddress">Fetching GPS...</div>
+        <strong>📍 Current Building Location</strong>
+        <div class="location-address" id="locationAddress">Fetching precise GPS...</div>
         <div class="location-coords" id="locationCoords"></div>
+        <a id="locVerifyLink" class="loc-verify-btn" target="_blank" style="display:none;">🗺️ Verify on Google Maps</a>
       </div>
 
       <div class="btn-group">
@@ -497,6 +517,12 @@
         }
         locationData = { address, lat, lng, capturedAt: new Date().toISOString() };
         document.getElementById('locationAddress').textContent = address;
+
+        // Show verification link
+        const verLink = document.getElementById('locVerifyLink');
+        verLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
+        verLink.style.display = 'inline-block';
+
         showMsg('✅ High-precision photo and building location captured!', 'success');
       } catch (e) {
         document.getElementById('locationAddress').textContent = 'Unable to get location. Enable GPS for building details.';
