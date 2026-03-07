@@ -686,6 +686,8 @@
           work_hours: record.work_hours || '',
           attendance_type: record.attendance_type || 'In Progress',
           location: record.location,
+          lat: record.lat || null,
+          lng: record.lng || null,
           photo: record.photo
         };
         const response = await fetch('/api/attendance', {
@@ -818,7 +820,10 @@
         date: getToday(), clock_in: fmtTimeShort(now), clock_in_iso: now.toISOString(),
         clock_out: null, work_hours: null,
         attendance_type: lateIn ? 'Half Day' : 'In Progress',
-        location: loc.address || 'Unknown', photo
+        location: loc.address || 'Unknown',
+        lat: loc.lat || null,
+        lng: loc.lng || null,
+        photo
       };
       const recs = getRecords(); recs.unshift(record); saveRecords(recs);
       clockInTime = now;

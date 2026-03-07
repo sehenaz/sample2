@@ -25,20 +25,22 @@ const db = new sqlite3.Database(dbPath, (err) => {
   } else {
     console.log('Connected to the SQLite database.');
     db.run(`CREATE TABLE IF NOT EXISTS attendance (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      emp_id TEXT,
-      emp_name TEXT,
-      dept TEXT,
-      city TEXT,
-      date TEXT,
-      clock_in TEXT,
-      clock_out TEXT,
-      work_hours TEXT,
-      attendance_type TEXT,
-      location TEXT,
-      photo TEXT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        emp_id TEXT,
+        emp_name TEXT,
+        dept TEXT,
+        city TEXT,
+        date TEXT,
+        clock_in TEXT,
+        clock_out TEXT,
+        work_hours TEXT,
+        attendance_type TEXT,
+        location TEXT,
+        lat REAL,
+        lng REAL,
+        photo TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`);
   }
 });
 
@@ -46,7 +48,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Save or Update Attendance
 app.post('/api/attendance', (req, res) => {
-  const { emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, photo } = req.body;
+  const { emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, lat, lng, photo } = req.body;
 
   if (!emp_id || !date) {
     return res.status(400).json({ error: 'emp_id and date are required' });
@@ -62,9 +64,9 @@ app.post('/api/attendance', (req, res) => {
       // Update existing record
       const updateQuery = `UPDATE attendance SET 
         emp_name = ?, dept = ?, city = ?, clock_in = ?, clock_out = ?, 
-        work_hours = ?, attendance_type = ?, location = ?, photo = ?
+        work_hours = ?, attendance_type = ?, location = ?, lat = ?, lng = ?, photo = ?
         WHERE id = ?`;
-      db.run(updateQuery, [emp_name, dept, city, clock_in, clock_out, work_hours, attendance_type, location, photo, row.id], function (err) {
+      db.run(updateQuery, [emp_name, dept, city, clock_in, clock_out, work_hours, attendance_type, location, lat || null, lng || null, photo, row.id], function (err) {
         if (err) {
           return res.status(500).json({ error: err.message });
         }
@@ -72,15 +74,16 @@ app.post('/api/attendance', (req, res) => {
       });
     } else {
       // Insert new record
-      const insertQuery = `INSERT INTO attendance (
-        emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, photo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-      db.run(insertQuery, [emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, photo], function (err) {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        res.json({ message: 'Attendance saved successfully', id: this.lastID });
-      });
+      db.run(
+        `INSERT INTO attendance (emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, lat, lng, photo)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, lat, lng, photo],
+        function (err) {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+          res.json({ message: 'Attendance saved successfully', id: this.lastID });
+        });
     }
   });
 });
