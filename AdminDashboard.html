@@ -325,9 +325,28 @@
 
     .loc-val {
       font-size: 11px;
-      color: #666;
-      max-width: 180px;
+      color: #777;
+      max-width: 250px;
       line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .map-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #3f51b5;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .map-link:hover {
+      text-decoration: underline;
     }
 
     .status-badge {
@@ -649,7 +668,13 @@
             <td class="time-val">${r.clock_in || '—'}</td>
             <td class="time-val">${r.clock_out || '<span style="color:#ccc">—</span>'}</td>
             <td class="time-val">${r.work_hours || '<span style="color:#ccc">—</span>'}</td>
-            <td class="loc-val">${r.location || 'Unknown'}</td>
+            <td>
+              <div class="loc-val" title="${r.location || ''}">${r.location || 'Unknown'}</div>
+              ${r.lat && r.lng ? `<a class="map-link" href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank">
+                <svg style="width:12px;height:12px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87,-3.13,-7,-7,-7zm0,9.5c-1.38,0,-2.5,-1.12,-2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5,-1.12,2.5,-2.5,2.5z"/></svg>
+                View Map
+              </a>` : ''}
+            </td>
             <td>${getBadge(r.attendance_type)}</td>
           </tr>`;
         }).join('');
@@ -679,7 +704,10 @@
               <div class="mob-item"><label>Clock Out</label><div class="v">${r.clock_out || '—'}</div></div>
               <div class="mob-item"><label>Hours</label><div class="v">${r.work_hours || '—'}</div></div>
             </div>
-            <div class="mob-loc">📍 ${r.location || 'Unknown location'}</div>
+            <div class="mob-loc">
+              📍 ${r.location || 'Unknown location'}
+              ${r.lat && r.lng ? `<br/><a class="map-link" href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank" style="margin-top:8px;font-size:12px">View Exact Location on Map</a>` : ''}
+            </div>
           </div>`;
         }).join('');
       }
