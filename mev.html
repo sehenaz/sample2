@@ -447,28 +447,49 @@
     async function fetchLocation() {
       const box = document.getElementById('locationBox');
       box.classList.add('show');
-      document.getElementById('locationAddress').textContent = '⏳ Fetching GPS location...';
+      document.getElementById('locationAddress').textContent = '⏳ Fetching precise GPS location...';
       if (!navigator.geolocation) { document.getElementById('locationAddress').textContent = 'Geolocation not supported.'; return; }
       try {
-        const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }));
+        const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }));
         const lat = pos.coords.latitude, lng = pos.coords.longitude;
         document.getElementById('locationCoords').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
         let address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         try {
-          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`, { headers: { 'Accept': 'application/json' } });
+          // fetch with explicit addressdetails to get building, road, house_number
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`, {
+            headers: { 'Accept': 'application/json', 'User-Agent': 'MevtenciaAttendanceApp/1.0' }
+          });
           const d = await r.json();
           if (d && d.address) {
             const a = d.address;
-            address = [a.suburb || a.neighbourhood, a.city || a.town || a.village, a.state_district, a.state, a.postcode, a.country].filter(Boolean).join(', ');
+            const house = a.house_number || a.building || a.office || '';
+            const road = a.road || a.pedestrian || '';
+            const suburb = a.suburb || a.neighbourhood || '';
+            const area = a.city || a.town || a.village || '';
+            const district = a.state_district || '';
+            const state = a.state || '';
+
+            // Build a much more detailed address string
+            address = [house, road, suburb, area, district, state, a.postcode]
+              .filter(Boolean)
+              .join(', ');
+
+            if (!address || address.length < 5) address = d.display_name;
           }
-        } catch (e) { }
+        } catch (e) {
+          console.error("Geocoding failed", e);
+        }
         locationData = { address, lat, lng, capturedAt: new Date().toISOString() };
         document.getElementById('locationAddress').textContent = address;
-        showMsg('✅ Photo and location captured! Click Continue to proceed.', 'success');
+        showMsg('✅ High-precision photo and building location captured!', 'success');
       } catch (e) {
-        document.getElementById('locationAddress').textContent = 'Unable to get location. Enable GPS permission.';
+        document.getElementById('locationAddress').textContent = 'Unable to get location. Enable GPS for building details.';
         locationData = { address: 'Unknown', lat: 0, lng: 0, capturedAt: new Date().toISOString() };
-        showMsg('⚠️ Photo captured. GPS unavailable — please enable location.', 'warning');
+        showMsg('⚠️ GPS unavailable — Please enable high-accuracy location.', 'warning');
       }
     }
 
