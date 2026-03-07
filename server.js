@@ -13,7 +13,12 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Database Setup
-const dbPath = path.join(__dirname, 'attendance.db');
+const fs = require('fs');
+const persistenceDir = process.env.PERSISTENCE_DIR || __dirname;
+if (persistenceDir !== __dirname && !fs.existsSync(persistenceDir)) {
+  fs.mkdirSync(persistenceDir, { recursive: true });
+}
+const dbPath = path.join(persistenceDir, 'attendance.db');
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
@@ -59,7 +64,7 @@ app.post('/api/attendance', (req, res) => {
         emp_name = ?, dept = ?, city = ?, clock_in = ?, clock_out = ?, 
         work_hours = ?, attendance_type = ?, location = ?, photo = ?
         WHERE id = ?`;
-      db.run(updateQuery, [emp_name, dept, city, clock_in, clock_out, work_hours, attendance_type, location, photo, row.id], function(err) {
+      db.run(updateQuery, [emp_name, dept, city, clock_in, clock_out, work_hours, attendance_type, location, photo, row.id], function (err) {
         if (err) {
           return res.status(500).json({ error: err.message });
         }
@@ -70,7 +75,7 @@ app.post('/api/attendance', (req, res) => {
       const insertQuery = `INSERT INTO attendance (
         emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, photo
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-      db.run(insertQuery, [emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, photo], function(err) {
+      db.run(insertQuery, [emp_id, emp_name, dept, city, date, clock_in, clock_out, work_hours, attendance_type, location, photo], function (err) {
         if (err) {
           return res.status(500).json({ error: err.message });
         }
