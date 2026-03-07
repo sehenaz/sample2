@@ -466,7 +466,8 @@
           const d = await r.json();
           if (d && d.address) {
             const a = d.address;
-            const house = a.house_number || a.building || a.office || '';
+            const building = a.building || a.office || a.amenity || a.shop || a.tourism || a.industrial || a.house_name || '';
+            const house = a.house_number || '';
             const road = a.road || a.pedestrian || '';
             const suburb = a.suburb || a.neighbourhood || '';
             const area = a.city || a.town || a.village || '';
@@ -474,7 +475,7 @@
             const state = a.state || '';
 
             // Build a much more detailed address string
-            address = [house, road, suburb, area, district, state, a.postcode]
+            address = [building, house, road, suburb, area, district, state, a.postcode]
               .filter(Boolean)
               .join(', ');
 
