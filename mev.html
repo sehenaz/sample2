@@ -459,8 +459,7 @@
         document.getElementById('locationCoords').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
         let address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         try {
-          // Adding zoom=18 and extratags=1 to get the most specific building names from OpenStreetMap
-          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&extratags=1`, {
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&extratags=1&namedetails=1`, {
             headers: { 'Accept': 'application/json', 'User-Agent': 'MevtenciaAttendanceApp/1.0' }
           });
           const d = await r.json();
@@ -471,7 +470,9 @@
               a.leisure || a.house_name || a.residential || a.apartments || a.mall ||
               a.hotel || a.theatre || a.school || a.college || a.university ||
               a.hospital || a.government || a.public_building || a.retail ||
-              a.bank || a.restaurant || a.cafe || a.fast_food || a.clinic || a.pharmacy || '';
+              a.bank || a.restaurant || a.cafe || a.fast_food || a.clinic || a.pharmacy ||
+              a.commercial || a.warehouse || a.chapel || a.place_of_worship || a.clubhouse || '';
+
             const house = a.house_number || '';
             const road = a.road || a.pedestrian || '';
             const suburb = a.suburb || a.neighbourhood || '';
@@ -484,8 +485,10 @@
               .filter(Boolean)
               .join(', ');
 
-            // If my custom format is shorter than the API's full display name, use the API's version
-            if (d.display_name && d.display_name.length > address.length && !address.includes(landmark)) {
+            // CRITICAL FIX: If landmark is empty OR the full display name contains more specific names, prefer the display name
+            if (d.display_name && (landmark === '' || d.display_name.length > address.length)) {
+              // Check if the display name starts with something useful (usually building/landmark)
+              // but keep our formatted version if the display name is just a list of generic areas
               address = d.display_name;
             }
           }
