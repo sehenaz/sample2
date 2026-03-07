@@ -41,6 +41,19 @@ const db = new sqlite3.Database(dbPath, (err) => {
         photo TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
+    // Migration: Add lat/lng columns if they don't exist
+    db.serialize(() => {
+      db.all("PRAGMA table_info(attendance)", [], (err, rows) => {
+        if (err) return;
+        const cols = rows.map(r => r.name);
+        if (!cols.includes('lat')) {
+          db.run("ALTER TABLE attendance ADD COLUMN lat REAL");
+        }
+        if (!cols.includes('lng')) {
+          db.run("ALTER TABLE attendance ADD COLUMN lng REAL");
+        }
+      });
+    });
   }
 });
 
