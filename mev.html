@@ -459,8 +459,8 @@
         document.getElementById('locationCoords').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
         let address = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         try {
-          // fetch with explicit addressdetails to get building, road, house_number
-          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`, {
+          // Adding zoom=18 and extratags=1 to get the most specific building names from OpenStreetMap
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&extratags=1`, {
             headers: { 'Accept': 'application/json', 'User-Agent': 'MevtenciaAttendanceApp/1.0' }
           });
           const d = await r.json();
