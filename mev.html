@@ -466,7 +466,12 @@
           const d = await r.json();
           if (d && d.address) {
             const a = d.address;
-            const building = a.building || a.office || a.amenity || a.shop || a.tourism || a.industrial || a.house_name || '';
+            // Extremely thorough Landmark/Building detection
+            const landmark = a.building || a.office || a.amenity || a.shop || a.tourism || a.industrial ||
+              a.leisure || a.house_name || a.residential || a.apartments || a.mall ||
+              a.hotel || a.theatre || a.school || a.college || a.university ||
+              a.hospital || a.government || a.public_building || a.retail ||
+              a.bank || a.restaurant || a.cafe || a.fast_food || a.clinic || a.pharmacy || '';
             const house = a.house_number || '';
             const road = a.road || a.pedestrian || '';
             const suburb = a.suburb || a.neighbourhood || '';
@@ -474,12 +479,15 @@
             const district = a.state_district || '';
             const state = a.state || '';
 
-            // Build a much more detailed address string
-            address = [building, house, road, suburb, area, district, state, a.postcode]
+            // Format: "Landmark, House No, Road, Suburb, Area..."
+            address = [landmark, house, road, suburb, area, district, state, a.postcode]
               .filter(Boolean)
               .join(', ');
 
-            if (!address || address.length < 5) address = d.display_name;
+            // If my custom format is shorter than the API's full display name, use the API's version
+            if (d.display_name && d.display_name.length > address.length && !address.includes(landmark)) {
+              address = d.display_name;
+            }
           }
         } catch (e) {
           console.error("Geocoding failed", e);
