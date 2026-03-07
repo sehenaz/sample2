@@ -196,6 +196,27 @@
       color: #3f51b5;
     }
 
+    .export-btn {
+      padding: 10px 18px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .export-btn:hover {
+      background: #1b5e20;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+      transform: translateY(-1px);
+    }
+
     /* Table */
     .table-container {
       background: white;
@@ -502,6 +523,13 @@
       </select>
       <button class="filter-btn" onclick="clearFilters()">✕ Clear</button>
       <button class="filter-btn" onclick="renderRecords()">⟳ Refresh</button>
+      <button class="export-btn" onclick="exportToCSV()">
+        <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24">
+          <path
+            d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M10.7,15.58L13.5,13.5L10.7,11.42V13H4.5V14H10.7V15.58Z" />
+        </svg>
+        Export CSV
+      </button>
     </div>
 
     <!-- Desktop Table -->
@@ -575,6 +603,8 @@
       return `<span class="status-badge badge-working">${type}</span>`;
     }
 
+    let lastFilteredData = [];
+
     async function renderRecords() {
       const all = await getAllRecords();
       const search = document.getElementById('searchFilter').value.toLowerCase();
@@ -589,6 +619,7 @@
       });
 
       list.sort((a, b) => parseDate(b.date).localeCompare(parseDate(a.date)));
+      lastFilteredData = list;
 
       // Stats
       document.getElementById('statTotal').textContent = all.length;
@@ -668,6 +699,40 @@
     function closeModal() { document.getElementById('photoModal').classList.remove('show'); }
 
     function adminLogout() { localStorage.removeItem('mev_adminSession'); }
+
+    function exportToCSV() {
+      if (!lastFilteredData.length) {
+        alert("No records to export!");
+        return;
+      }
+
+      const headers = ["Employee Name", "Employee ID", "Department", "City", "Date", "Clock In", "Clock Out", "Work Hours", "Location", "Status"];
+      const rows = lastFilteredData.map(r => [
+        `"${r.emp_name || ''}"`,
+        `"${r.emp_id || ''}"`,
+        `"${r.dept || ''}"`,
+        `"${r.city || ''}"`,
+        `"${r.date || ''}"`,
+        `"${r.clock_in || ''}"`,
+        `"${r.clock_out || ''}"`,
+        `"${r.work_hours || ''}"`,
+        `"${r.location || ''}"`,
+        `"${r.attendance_type || 'In Progress'}"`
+      ]);
+
+      let csvContent = "data:text/csv;charset=utf-8,"
+        + headers.join(",") + "\n"
+        + rows.map(e => e.join(",")).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      const fileName = `Attendance_Report_${new Date().toISOString().split('T')[0]}.csv`;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   </script>
 </body>
 
