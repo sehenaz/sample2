@@ -678,7 +678,8 @@
     };
 
     async function getRecordsFromBackend() {
-      const response = await fetch(`/api/attendance/${session.id}`);
+      // Use the specific employee endpoint with encoded query param to handle slashes in IDs
+      const response = await fetch(`/api/employee-attendance?id=${encodeURIComponent(session.id)}`);
       if (!response.ok) throw new Error('Failed to fetch');
       return await response.json();
     }

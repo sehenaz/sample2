@@ -100,11 +100,20 @@ app.get('/api/attendance', (req, res) => {
 
 // Get Attendance for specific Employee
 app.get('/api/attendance/:emp_id', (req, res) => {
-  const { emp_id } = req.params;
+  let emp_id = req.params.emp_id;
+  // If emp_id looks like a prefix due to a slash in the ID, try to get the full id from the query or a wildcard
   db.all(`SELECT * FROM attendance WHERE emp_id = ? ORDER BY date DESC`, [emp_id], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+// Targeted lookup by employee ID (supporting slashes via query param)
+app.get('/api/employee-attendance', (req, res) => {
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: 'ID is required' });
+  db.all(`SELECT * FROM attendance WHERE emp_id = ? ORDER BY date DESC`, [id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
