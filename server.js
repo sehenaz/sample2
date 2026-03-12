@@ -41,6 +41,36 @@ const db = new sqlite3.Database(dbPath, (err) => {
         photo TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
+
+    // Create employees table for registration data
+    db.run(`CREATE TABLE IF NOT EXISTS employees (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        emp_id TEXT UNIQUE,
+        employee_name TEXT,
+        employee_email TEXT,
+        phone_number TEXT,
+        alternative_phone TEXT,
+        dob TEXT,
+        age TEXT,
+        marital_status TEXT,
+        blood_group TEXT,
+        address TEXT,
+        nominee_name TEXT,
+        nominee_phone TEXT,
+        bank_name TEXT,
+        branch_name TEXT,
+        account_number TEXT,
+        ifsc_code TEXT,
+        branch_code TEXT,
+        upi_id TEXT,
+        employee_type TEXT,
+        salary TEXT,
+        designation TEXT,
+        joining_date TEXT,
+        work_location TEXT,
+        registered_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`);
+
     // Migration: Add lat/lng columns if they don't exist
     db.serialize(() => {
       db.all("PRAGMA table_info(attendance)", [], (err, rows) => {
@@ -58,6 +88,65 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 // API Endpoints
+
+// ========================
+// EMPLOYEE REGISTRATION
+// ========================
+
+// Register a new Employee
+app.post('/api/register', (req, res) => {
+  const {
+    employeeId, employeeName, employeeEmail, phoneNumber, alternativePhone,
+    dob, age, maritalStatus, bloodGroup, address,
+    nomineeName, nomineePhone, bankName, branchName,
+    accountNumber, ifscCode, branchCode, upiId,
+    employeeType, salary, designation, joiningDate, workLocation
+  } = req.body;
+
+  if (!employeeName || !employeeEmail) {
+    return res.status(400).json({ error: 'Employee name and email are required' });
+  }
+
+  const emp_id = employeeId || `MEV/${Math.floor(Math.random() * 999) + 100}/2025`;
+
+  db.run(
+    `INSERT OR IGNORE INTO employees (
+      emp_id, employee_name, employee_email, phone_number, alternative_phone,
+      dob, age, marital_status, blood_group, address,
+      nominee_name, nominee_phone, bank_name, branch_name,
+      account_number, ifsc_code, branch_code, upi_id,
+      employee_type, salary, designation, joining_date, work_location
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [
+      emp_id, employeeName, employeeEmail, phoneNumber, alternativePhone,
+      dob, age, maritalStatus, bloodGroup, address,
+      nomineeName, nomineePhone, bankName, branchName,
+      accountNumber, ifscCode, branchCode, upiId,
+      employeeType, salary, designation, joiningDate, workLocation
+    ],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Employee registered successfully', id: emp_id, rowId: this.lastID });
+    }
+  );
+});
+
+// Get All Registered Employees (for Admin History Page)
+app.get('/api/employees', (req, res) => {
+  db.all(`SELECT * FROM employees ORDER BY registered_at DESC`, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+// Delete an Employee
+app.delete('/api/employees/:emp_id', (req, res) => {
+  const emp_id = req.params.emp_id;
+  db.run(`DELETE FROM employees WHERE emp_id = ?`, [emp_id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Employee deleted', changes: this.changes });
+  });
+});
 
 // Save or Update Attendance
 app.post('/api/attendance', (req, res) => {

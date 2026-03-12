@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#3f51b5">
+  <title>MEVTENCIA - Add Employee</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    .header {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.2);
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .header h1 { color: #3f51b5; font-size: 24px; }
+    .header p { color: #888; font-size: 13px; margin-top: 3px; }
+    .back-btn {
+      text-decoration: none;
+      background: #3f51b5;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .back-btn:hover { background: #303f9f; }
+
+    #alertBox { margin-bottom: 16px; }
+    .alert {
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      animation: slideIn .3s ease;
+    }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-info    { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.2);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      color: #3f51b5;
+      font-size: 20px;
+      margin-bottom: 22px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #3f51b5;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      color: #333;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .form-group label .req { color: #e53935; }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .25s;
+      background: #fff;
+    }
+    .form-group input:focus,
+    .form-group select:focus { outline: none; border-color: #3f51b5; }
+
+    .salary-input { border-color: #ff9800 !important; background: #fff8e1 !important; font-weight: 700; }
+
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #3f51b5;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin: 22px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+    .btn {
+      padding: 13px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    .btn-primary { background: #3f51b5; color: white; }
+    .btn-primary:hover { background: #303f9f; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(63,81,181,.4); }
+    .btn-secondary { background: #607d8b; color: white; }
+    .btn-secondary:hover { background: #455a64; }
+    .btn-success { background: #4caf50; color: white; }
+    .btn-success:hover { background: #388e3c; }
+    .btn:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
+
+    /* Employee List */
+    .emp-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .emp-list-header h2 { color: #3f51b5; font-size: 20px; padding: 0; border: none; margin: 0; }
+
+    .search-bar {
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 13px;
+      min-width: 220px;
+      font-family: inherit;
+    }
+    .search-bar:focus { outline: none; border-color: #3f51b5; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    th {
+      background: #3f51b5;
+      color: white;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+    }
+    td { padding: 12px 14px; border-bottom: 1px solid #e0e0e0; font-size: 13px; vertical-align: middle; }
+    tr:hover td { background: #f5f7fa; }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-active  { background: #d4edda; color: #155724; }
+    .status-inactive { background: #f8d7da; color: #721c24; }
+
+    .act-btn {
+      padding: 5px 11px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+    .act-edit   { background: #3f51b5; color: white; }
+    .act-edit:hover { background: #303f9f; }
+    .act-del    { background: #f44336; color: white; }
+    .act-del:hover { background: #c62828; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .stat-card .num { font-size: 30px; font-weight: 800; }
+    .stat-card .lbl { font-size: 12px; opacity: .9; margin-top: 4px; }
+
+    .overflow-x { overflow-x: auto; }
+    .empty-state { text-align: center; padding: 40px; color: #bbb; font-size: 14px; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div>
+        <h1>👥 Add Employee</h1>
+        <p>Manually register employees into the MEVTENCIA system</p>
+      </div>
+      <a class="back-btn" href="AdminDashboard.html">← Back to Dashboard</a>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Total Employees</div></div>
+      <div class="stat-card"><div class="num" id="statActive">0</div><div class="lbl">Active</div></div>
+      <div class="stat-card"><div class="num" id="statInactive">0</div><div class="lbl">Inactive</div></div>
+    </div>
+
+    <!-- Add / Edit Form -->
+    <div class="card">
+      <h2 id="formTitle">➕ Add New Employee</h2>
+
+      <form id="empForm" onsubmit="handleSubmit(event)">
+        <input type="hidden" id="editingId" value="">
+
+        <div class="form-section-title">🪪 Basic Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Employee ID <span class="req">*</span></label>
+            <input type="text" id="empId" placeholder="e.g., EMP001" required>
+          </div>
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="empName" placeholder="e.g., John Doe" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="empEmail" placeholder="employee@mevrick.in">
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="empPhone" placeholder="10-digit number">
+          </div>
+        </div>
+
+        <div class="form-section-title">💼 Job Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Department</label>
+            <select id="empDepartment">
+              <option value="">Select Department</option>
+              <option value="IT">IT</option>
+              <option value="HR">HR</option>
+              <option value="Sales">Sales</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Finance">Finance</option>
+              <option value="Operations">Operations</option>
+              <option value="Digitization">Digitization</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Designation</label>
+            <input type="text" id="empDesignation" placeholder="e.g., Software Developer">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Work Location</label>
+            <select id="empLocation">
+              <option value="">Select Location</option>
+              <option value="Kalyani (HO)">Kalyani (Head Office)</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Lucknow">Lucknow</option>
+              <option value="Remote">Remote</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Employee Type</label>
+            <select id="empType">
+              <option value="Full Time">Full Time</option>
+              <option value="Casual">Casual/Contractual</option>
+              <option value="Intern">Intern</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section-title">💰 Salary</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Monthly Salary (₹) <span class="req">*</span></label>
+            <input type="number" id="empSalary" class="salary-input" placeholder="e.g., 50000" min="0" step="500" required>
+          </div>
+          <div class="form-group">
+            <label>Daily Rate (₹)</label>
+            <input type="number" id="empDailyRate" placeholder="Auto-calc if blank" min="0" step="100">
+          </div>
+        </div>
+
+        <div class="form-section-title">🔐 Access</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Password <span class="req">*</span></label>
+            <input type="password" id="empPassword" placeholder="Create a password" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="empStatus">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="submitBtn">✅ Add Employee</button>
+          <button type="button" class="btn btn-secondary" onclick="resetForm()">✕ Clear</button>
+          <button type="button" class="btn btn-success" onclick="saveToBackend()" id="backendBtn" style="display:none;">☁️ Sync to Server</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Employee List -->
+    <div class="card">
+      <div class="emp-list-header">
+        <h2>👥 Employee Database</h2>
+        <input type="text" class="search-bar" id="searchInput" placeholder="🔍 Search employees..." oninput="renderList()">
+      </div>
+      <div style="margin-bottom:14px; display:flex; gap:10px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" style="padding:8px 16px;font-size:12px;" onclick="exportCSV()">📊 Export CSV</button>
+        <button class="btn btn-success" style="padding:8px 16px;font-size:12px;" onclick="syncAllToBackend()">☁️ Sync All to Server</button>
+      </div>
+      <div class="overflow-x">
+        <table>
+          <thead>
+            <tr>
+              <th>Emp ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Salary/mo</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="listBody">
+            <tr><td colspan="8" class="empty-state">No employees added yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const LS_DB = 'mevtencia_employeeDatabase';
+
+    function loadDB() {
+      try { return JSON.parse(localStorage.getItem(LS_DB) || '{}'); } catch { return {}; }
+    }
+
+    function saveDB(db) {
+      localStorage.setItem(LS_DB, JSON.stringify(db));
+    }
+
+    let db = loadDB();
+
+    // ─── Stats ───────────────────────────────────
+    function updateStats() {
+      const all = Object.values(db);
+      document.getElementById('statTotal').textContent = all.length;
+      document.getElementById('statActive').textContent = all.filter(e => e.status === 'active').length;
+      document.getElementById('statInactive').textContent = all.filter(e => e.status === 'inactive').length;
+    }
+
+    // ─── Table ───────────────────────────────────
+    function renderList() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const all = Object.values(db).filter(e =>
+        [e.id, e.name, e.email, e.department, e.designation, e.work_location].some(v => (v || '').toLowerCase().includes(search))
+      );
+
+      const tbody = document.getElementById('listBody');
+      if (!all.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No employees found.</td></tr>`;
+      } else {
+        tbody.innerHTML = all.map(e => `
+          <tr>
+            <td><strong>${e.id}</strong></td>
+            <td>${e.name}</td>
+            <td>${e.email || '—'}</td>
+            <td>${e.department || '—'}</td>
+            <td style="font-weight:700;color:#e65100;">₹${parseInt(e.salary || 0).toLocaleString('en-IN')}</td>
+            <td>${e.employeeType || 'Full Time'}</td>
+            <td><span class="status-badge ${e.status === 'active' ? 'status-active' : 'status-inactive'}">${(e.status || 'active').toUpperCase()}</span></td>
+            <td>
+              <button class="act-btn act-edit" onclick="editEmployee('${e.id}')">Edit</button>
+              <button class="act-btn act-del"  onclick="deleteEmployee('${e.id}')">Delete</button>
+            </td>
+          </tr>`).join('');
+      }
+      updateStats();
+    }
+
+    // ─── Form Submit ────────────────────────────
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      const editingId = document.getElementById('editingId').value;
+      const empId = document.getElementById('empId').value.trim().toUpperCase();
+      const name  = document.getElementById('empName').value.trim();
+      const email = document.getElementById('empEmail').value.trim();
+      const phone = document.getElementById('empPhone').value.trim();
+      const dept  = document.getElementById('empDepartment').value;
+      const designation = document.getElementById('empDesignation').value.trim();
+      const location = document.getElementById('empLocation').value;
+      const type  = document.getElementById('empType').value;
+      const salary = parseInt(document.getElementById('empSalary').value) || 0;
+      const dailyRate = parseInt(document.getElementById('empDailyRate').value) || Math.round(salary / 26);
+      const password  = document.getElementById('empPassword').value;
+      const status    = document.getElementById('empStatus').value;
+
+      if (!empId || !name || !password || salary <= 0) {
+        showAlert('Please fill all required fields (ID, Name, Password, Salary).', 'error');
+        return;
+      }
+
+      if (!editingId && db[empId]) {
+        showAlert(`Employee ID <strong>${empId}</strong> already exists! Use a different ID.`, 'error');
+        return;
+      }
+
+      const emp = {
+        id: empId,
+        name, email, phone, department: dept,
+        designation, work_location: location,
+        employeeType: type, salary, dailyRate,
+        password, status,
+        createdAt: db[empId]?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      db[empId] = emp;
+      saveDB(db);
+
+      showAlert(`✅ Employee <strong>${name}</strong> (${empId}) ${editingId ? 'updated' : 'added'} successfully!`, 'success');
+      document.getElementById('backendBtn').style.display = 'inline-block';
+      resetForm();
+      renderList();
+
+      // Auto-sync to backend
+      pushToBackend(emp);
+    }
+
+    // ─── Backend Sync ────────────────────────────
+    async function pushToBackend(emp) {
+      try {
+        const payload = {
+          employeeId: emp.id,
+          employeeName: emp.name,
+          employeeEmail: emp.email,
+          phoneNumber: emp.phone,
+          designation: emp.designation || emp.department || '',
+          salary: emp.salary,
+          employeeType: emp.employeeType,
+          workLocation: emp.work_location,
+          joiningDate: new Date().toISOString().split('T')[0],
+          dob: '', age: '', maritalStatus: '', bloodGroup: '',
+          address: '', nomineeName: '', nomineePhone: '',
+          bankName: '', branchName: '', accountNumber: '',
+          ifscCode: '', branchCode: '', upiId: ''
+        };
+        const resp = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          console.log(`Synced ${emp.id} to backend`);
+        }
+      } catch (err) {
+        console.warn('Backend sync failed (offline?):', err.message);
+      }
+    }
+
+    async function syncAllToBackend() {
+      const all = Object.values(db);
+      if (!all.length) { showAlert('No employees to sync!', 'error'); return; }
+
+      showAlert(`Syncing ${all.length} employees to server...`, 'info');
+      let ok = 0;
+      for (const emp of all) {
+        try { await pushToBackend(emp); ok++; } catch {}
+      }
+      showAlert(`✅ Synced ${ok}/${all.length} employees to server!`, 'success');
+    }
+
+    async function saveToBackend() {
+      await syncAllToBackend();
+    }
+
+    // ─── Edit ────────────────────────────────────
+    function editEmployee(empId) {
+      const emp = db[empId];
+      if (!emp) return;
+
+      document.getElementById('editingId').value = empId;
+      document.getElementById('empId').value = empId;
+      document.getElementById('empId').disabled = true;
+      document.getElementById('empName').value = emp.name || '';
+      document.getElementById('empEmail').value = emp.email || '';
+      document.getElementById('empPhone').value = emp.phone || '';
+      document.getElementById('empDepartment').value = emp.department || '';
+      document.getElementById('empDesignation').value = emp.designation || '';
+      document.getElementById('empLocation').value = emp.work_location || '';
+      document.getElementById('empType').value = emp.employeeType || 'Full Time';
+      document.getElementById('empSalary').value = emp.salary || '';
+      document.getElementById('empDailyRate').value = emp.dailyRate || '';
+      document.getElementById('empPassword').value = emp.password || '';
+      document.getElementById('empStatus').value = emp.status || 'active';
+
+      document.getElementById('formTitle').textContent = `✏️ Edit Employee: ${emp.name}`;
+      document.getElementById('submitBtn').textContent = '💾 Update Employee';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showAlert(`Editing <strong>${emp.name}</strong>. Update details and click Save.`, 'info');
+    }
+
+    function resetForm() {
+      document.getElementById('empForm').reset();
+      document.getElementById('editingId').value = '';
+      document.getElementById('empId').disabled = false;
+      document.getElementById('formTitle').textContent = '➕ Add New Employee';
+      document.getElementById('submitBtn').textContent = '✅ Add Employee';
+    }
+
+    // ─── Delete ──────────────────────────────────
+    function deleteEmployee(empId) {
+      if (!confirm(`Delete employee ${empId}? This cannot be undone.`)) return;
+      delete db[empId];
+      saveDB(db);
+      renderList();
+      showAlert(`Employee ${empId} deleted.`, 'info');
+    }
+
+    // ─── Export CSV ──────────────────────────────
+    function exportCSV() {
+      const all = Object.values(db);
+      if (!all.length) { showAlert('No employees to export!', 'error'); return; }
+      let csv = 'Employee ID,Name,Email,Phone,Department,Designation,Work Location,Type,Salary,Daily Rate,Status,Created At\n';
+      all.forEach(e => {
+        csv += `${e.id},"${e.name}","${e.email || ''}","${e.phone || ''}","${e.department || ''}","${e.designation || ''}","${e.work_location || ''}","${e.employeeType || ''}",${e.salary},${e.dailyRate || 0},${e.status},"${e.createdAt || ''}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `MEVTENCIA_Employees_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showAlert('✅ CSV exported!', 'success');
+    }
+
+    // ─── Alert ───────────────────────────────────
+    function showAlert(msg, type) {
+      document.getElementById('alertBox').innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+      setTimeout(() => { document.getElementById('alertBox').innerHTML = ''; }, 5000);
+    }
+
+    // ─── Init ────────────────────────────────────
+    renderList();
+  </script>
+</body>
+
+</html>
