@@ -167,7 +167,7 @@
 
     async function loadData() {
       try {
-        const resp = await fetch('/api/employees');
+        const resp = await fetch('http://localhost:3000/api/employees');
         if (!resp.ok) throw new Error('API error');
         allData = await resp.json();
         renderTable();
@@ -265,7 +265,7 @@
     async function deleteEmployee(empId) {
       if (!confirm(`Delete employee ${empId}? This cannot be undone.`)) return;
       try {
-        const resp = await fetch(`/api/employees/${encodeURIComponent(empId)}`, { method: 'DELETE' });
+        const resp = await fetch(`http://localhost:3000/api/employees/${encodeURIComponent(empId)}`, { method: 'DELETE' });
         if (resp.ok) {
           allData = allData.filter(r => r.emp_id !== empId);
           renderTable();

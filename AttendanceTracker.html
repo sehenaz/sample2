@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#3f51b5" />
   <title>MEVTENCIA — Attendance Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       margin: 0;
@@ -477,6 +478,47 @@
     .toast.show {
       transform: translateX(-50%) translateY(0);
     }
+
+    /* Insights Section */
+    .insights-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media(min-width: 600px) {
+      .insights-card { grid-template-columns: 1.2fr 1fr; align-items: center; }
+    }
+    .chart-container { position: relative; height: 220px; width: 100%; }
+    .salary-payout-box {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .salary-payout-box h4 {
+      color: #3f51b5;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .salary-payout-box .payout-amount {
+      font-size: 28px;
+      font-weight: 800;
+      color: #10b981;
+      margin-bottom: 8px;
+    }
+    .salary-details {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .salary-details strong { color: #334155; }
   </style>
 </head>
 
@@ -574,6 +616,23 @@
       </div>
     </div>
 
+    <!-- Monthly Insights -->
+    <div class="insights-card">
+      <div class="chart-container">
+        <canvas id="attendanceChart"></canvas>
+      </div>
+      <div class="salary-payout-box">
+        <h4>💰 Estimated Payout (Current Month)</h4>
+        <div class="payout-amount" id="salaryPayout">₹0</div>
+        <div class="salary-details" id="salaryDetails">
+          Base Salary: <strong>₹0/mo</strong><br>
+          Working Days: <strong id="workDaysCount">0</strong> / <span id="monthDays">30</span><br>
+          Absent Days: <strong id="absentDaysCount">0</strong><br>
+          <small>(Formula: Worked / Total Month Days × Base Salary)</small>
+        </div>
+      </div>
+    </div>
+
     <!-- Attendance History -->
     <div class="attendance-table">
       <h3>Attendance History</h3>
@@ -630,11 +689,10 @@
       }
 
       setInterval(tickClock, 1000); tickClock();
-
-      // INITIALIZE LOCAL STATE IMMEDIATELY
       loadTodayState();
       renderHistory();
       updateSummary();
+      initAnalytics();
 
       // AUTO CLOCK IN LOGIC:
       // If we have a fresh photo capture and no clock-in for today, do it automatically.
@@ -671,12 +729,90 @@
             localStorage.setItem(getKey(), JSON.stringify(merged));
             renderHistory();
             updateSummary();
+            initAnalytics();
           }
         } catch (e) {
           console.warn('Background sync failed:', e);
         }
       })();
     };
+
+    let attChart = null;
+
+    async function initAnalytics() {
+      const records = getRecords();
+      const now = new Date();
+      const monthPrefix = String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+      
+      // Calculate month details
+      const totalMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      document.getElementById('monthDays').textContent = totalMonthDays;
+
+      // This month records
+      const thisMonthRecs = records.filter(r => r.date && r.date.endsWith(monthPrefix));
+      
+      let presentFull = 0;
+      let presentHalf = 0;
+      
+      thisMonthRecs.forEach(r => {
+        if (r.attendance_type === 'Full Day') presentFull++;
+        else if (r.attendance_type && r.attendance_type.includes('Half')) presentHalf++;
+      });
+
+      const workedDaysValue = presentFull + (presentHalf * 0.5);
+      // We assume every day is a working day for simplicity, or we could subtract Sundays. 
+      // Based on user prompt "absecent day wise count", we use total calendar days.
+      const absentDays = totalMonthDays - workedDaysValue;
+
+      document.getElementById('workDaysCount').textContent = workedDaysValue;
+      document.getElementById('absentDaysCount').textContent = absentDays.toFixed(1);
+
+      // Fetch base salary from backend
+      let monthlySalary = 0;
+      try {
+        const resp = await fetch('http://localhost:3000/api/employees');
+        if (resp.ok) {
+          const allEmps = await resp.json();
+          const me = allEmps.find(e => e.emp_id === session.id);
+          if (me && me.salary) monthlySalary = parseInt(me.salary);
+        }
+      } catch (e) { console.warn("Could not fetch salary from backend", e); }
+
+      if (monthlySalary > 0) {
+        document.getElementById('salaryDetails').innerHTML = `
+          Base Salary: <strong>₹${monthlySalary.toLocaleString('en-IN')}/mo</strong><br>
+          Worked: <strong id="workDaysCount">${workedDaysValue}</strong> / <span id="monthDays">${totalMonthDays}</span> days<br>
+          Absent: <strong id="absentDaysCount">${absentDays.toFixed(1)}</strong> days<br>
+          <small>(Formula: Worked / Total Month Days × Base Salary)</small>
+        `;
+        const payout = (worked_days_val, total_days, base) => Math.round((worked_days_val / total_days) * base);
+        document.getElementById('salaryPayout').textContent = '₹' + payout(workedDaysValue, totalMonthDays, monthlySalary).toLocaleString('en-IN');
+      }
+
+      // Render Chart
+      const ctx = document.getElementById('attendanceChart').getContext('2d');
+      if (attChart) attChart.destroy();
+      
+      attChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Full Day', 'Half Day', 'Absent'],
+          datasets: [{
+            data: [presentFull, presentHalf, absentDays],
+            backgroundColor: ['#10b981', '#fbbf24', '#f43f5e'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } },
+            title: { display: true, text: 'Attendance Share (Current Month)', font: { size: 13, weight: 'bold' }, color: '#3f51b5' }
+          }
+        }
+      });
+    }
 
     async function getRecordsFromBackend() {
       // Use the specific employee endpoint with encoded query param to handle slashes in IDs

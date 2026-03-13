@@ -103,6 +103,8 @@ app.post('/api/register', (req, res) => {
     employeeType, salary, designation, joiningDate, workLocation
   } = req.body;
 
+  console.log(`[Registration] Attempting to register ${employeeName} (${employeeEmail})`);
+
   if (!employeeName || !employeeEmail) {
     return res.status(400).json({ error: 'Employee name and email are required' });
   }
@@ -125,7 +127,11 @@ app.post('/api/register', (req, res) => {
       employeeType, salary, designation, joiningDate, workLocation
     ],
     function (err) {
-      if (err) return res.status(500).json({ error: err.message });
+      if (err) {
+        console.error(`[Registration] Error: ${err.message}`);
+        return res.status(500).json({ error: err.message });
+      }
+      console.log(`[Registration] Success: ${emp_id} (rowId: ${this.lastID})`);
       res.json({ message: 'Employee registered successfully', id: emp_id, rowId: this.lastID });
     }
   );

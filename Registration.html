@@ -900,7 +900,9 @@
                 employeeName: document.getElementById('employeeName').value,
                 employeeEmail: document.getElementById('employeeEmail').value,
                 phoneNumber: document.getElementById('phoneNumber').value,
+                alternativePhone: document.getElementById('alternativePhone').value,
                 dob: document.getElementById('dob').value,
+                age: document.getElementById('age').value,
                 maritalStatus: document.getElementById('maritalStatus').value,
                 bloodGroup: document.getElementById('bloodGroup').value,
                 address: document.getElementById('address').value,
@@ -910,6 +912,8 @@
                 branchName: document.getElementById('branchName').value,
                 accountNumber: document.getElementById('accountNumber').value,
                 ifscCode: document.getElementById('ifscCode').value,
+                branchCode: document.getElementById('branchCode').value,
+                upiId: document.getElementById('upiId').value,
                 employeeType: document.getElementById('employeeType').value,
                 salary: document.getElementById('salary').value,
                 designation: document.getElementById('designation').value,
@@ -922,7 +926,7 @@
                 generateAppointmentLetter(formData);
 
                 // ✅ SAVE TO BACKEND DATABASE (SQLite via Node.js)
-                const response = await fetch('/api/register', {
+                const response = await fetch('http://localhost:3000/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
@@ -1042,19 +1046,22 @@
                 // but usually good to give the admin the file. We leave it as requested.
 
                 // Show success message
-                successMsg.innerHTML = `
-                            <strong>✅ Registration Successful!</strong><br><br>
-                            <strong>Welcome to Mevrick Solutions, ${formData.employeeName}!</strong><br><br>
-                            📄 Your appointment letter has been generated and downloaded<br>
-                            📊 Registration data saved to Local Database<br>
-                            💼 Employment Type: ${formData.employeeType}<br>
-                            📍 Work Location: ${formData.workLocation}<br>
-                            📅 Joining Date: ${new Date(formData.joiningDate).toLocaleDateString('en-IN')}<br>
-                            <br>
-                            <small style="color: #856404; background: #fff3cd; padding: 8px; display: block; border-radius: 4px;">
-                                <strong>Note:</strong> To enable automatic email delivery of the appointment letter, 
-                                please configure EmailJS. Instructions are provided in the code comments.
-                            </small>
+                        successMsg.innerHTML = `
+                            <div style="text-align: center; padding: 10px;">
+                                <strong style="font-size: 20px;">✅ Registration Successful!</strong><br><br>
+                                <strong>Welcome to Mevrick Solutions, ${formData.employeeName}!</strong><br><br>
+                                📄 Your appointment letter has been generated and downloaded<br>
+                                📊 Registration data saved to Database<br>
+                                💼 Employment Type: ${formData.employeeType}<br>
+                                📍 Work Location: ${formData.workLocation}<br>
+                                📅 Joining Date: ${new Date(formData.joiningDate).toLocaleDateString('en-IN')}<br><br>
+                                <a href="EmployeeHistory.html" style="display: inline-block; background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">👥 View Registration History</a>
+                                <br>
+                                <small style="color: #856404; background: #fff3cd; padding: 8px; display: block; border-radius: 4px; text-align: left;">
+                                    <strong>Note:</strong> To enable automatic email delivery, 
+                                    please configure EmailJS in the code.
+                                </small>
+                            </div>
                         `;
                 successMsg.style.display = 'block';
 
