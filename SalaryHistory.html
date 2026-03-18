@@ -105,14 +105,43 @@
 
     async function calculateSalaryHistory(empId) {
       let records = [];
+      let baseMonthlySalary = 15000; // Default fallback
+      
       try {
-        const response = await fetch('/api/employee-attendance?id=' + encodeURIComponent(empId));
-        if (response.ok) {
-          records = await response.json();
+        // Fetch specific employee info for salary
+        const empResp = await fetch('/api/employees');
+        if (empResp.ok) {
+          const emps = await empResp.json();
+          const me = emps.find(e => e.emp_id === empId);
+          if (me && me.salary) baseMonthlySalary = parseInt(me.salary);
         }
       } catch (e) {
-        console.warn('Could not fetch from backend, using local storage.');
+        console.warn('Backend fetch failed, using defaults.');
       }
+      
+      // Look up manual salary set from AddEmployee or Registration locally
+      try {
+        const lsDB = JSON.parse(localStorage.getItem('mevtencia_employeeDatabase') || '{}');
+        let localEmp = lsDB[empId];
+        // Alternatively it might be under a different key but having the correct ID
+        if (!localEmp) {
+          localEmp = Object.values(lsDB).find(e => e.id === empId || e.employeeId === empId);
+        }
+        if (localEmp && localEmp.salary) {
+          baseMonthlySalary = parseInt(localEmp.salary);
+        }
+      } catch (e) { }
+
+      // Update the informational note on top
+      const dispNote = document.querySelector('.rate-note');
+      if (dispNote) {
+        dispNote.innerHTML = `<strong>Note:</strong> Estimated salary is calculated based on a base monthly salary of <strong>₹${baseMonthlySalary.toLocaleString('en-IN')}</strong>.<br> (Daily Rate = Base / Days in Month. Full day = 1.0, Half day = 0.5)`;
+      }
+
+      try {
+        const response = await fetch('/api/employee-attendance?id=' + encodeURIComponent(empId));
+        if (response.ok) records = await response.json();
+      } catch (e) { }
       
       if (records.length === 0) {
         records = JSON.parse(localStorage.getItem(`mev_att_${empId}`) || '[]');
@@ -120,72 +149,104 @@
       
       const monthlyData = {};
       
+      // Group records by month and create a date map for sandwich check
       records.forEach(r => {
         if (!r.date) return;
+        const parts = r.date.split('/'); // DD/MM/YYYY
+        if (parts.length !== 3) return;
         
-        let monthName = "";
-        let monthKey = "";
-        
-        if (r.date.includes('/')) {
-          const parts = r.date.split('/'); // DD/MM/YYYY
-          if (parts.length === 3) {
-            const d = new Date(parts[2], parseInt(parts[1])-1, parts[0]);
-            monthName = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
-            monthKey = parts[2] + '-' + parts[1];
-          }
-        } else if (r.date.includes('-')) {
-           const d = new Date(r.date);
-           monthName = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
-           monthKey = r.date.substring(0, 7);
-        }
-        
-        if (!monthKey || monthName === "Invalid Date") return;
+        const d = new Date(parts[2], parseInt(parts[1])-1, parts[0]);
+        const monthKey = parts[2] + '-' + parts[1];
+        const monthName = d.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
         
         if (!monthlyData[monthKey]) {
-          monthlyData[monthKey] = { name: monthName, fullDays: 0, halfDays: 0, totalDays: 0 };
+          monthlyData[monthKey] = { 
+            name: monthName, 
+            attendanceMap: {}, 
+            year: parseInt(parts[2]), 
+            monthIndex: parseInt(parts[1]) - 1 
+          };
         }
-        
-        const type = r.attendance_type || 'In Progress';
-        if (type === 'Full Day') {
-          monthlyData[monthKey].fullDays += 1;
-          monthlyData[monthKey].totalDays += 1;
-        } else if (type.includes('Half')) {
-          monthlyData[monthKey].halfDays += 1;
-          monthlyData[monthKey].totalDays += 0.5;
-        }
+        monthlyData[monthKey].attendanceMap[parseInt(parts[0])] = r.attendance_type;
       });
       
       const sortedMonths = Object.keys(monthlyData).sort().reverse();
-      
       const container = document.getElementById('salaryList');
+      
       if (sortedMonths.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">No attendance records found to calculate salary.</div>';
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">No attendance records found.</div>';
         return;
       }
       
       container.innerHTML = sortedMonths.map(key => {
         const data = monthlyData[key];
-        const estSalary = data.totalDays * DAILY_RATE;
+        const daysInMonth = new Date(data.year, data.monthIndex + 1, 0).getDate();
+        const dailyRate = baseMonthlySalary / daysInMonth;
+        
+        let payableDays = 0;
+        let absentDays = 0;
+        let holidays = 0;
+        let sandwichedLeaves = 0;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const status = data.attendanceMap[day];
+          const d = new Date(data.year, data.monthIndex, day);
+          const isSunday = d.getDay() === 0;
+          const isSaturday = d.getDay() === 6;
+          
+          if (status === 'Full Day') {
+            payableDays += 1;
+          } else if (status && status.includes('Half')) {
+            payableDays += 0.5;
+            absentDays += 0.5;
+          } else if (isSunday) {
+            // Sandwich Rule: Check Sat and Mon
+            const satStatus = data.attendanceMap[day - 1];
+            const monStatus = data.attendanceMap[day + 1];
+            
+            const satAbsent = !satStatus || satStatus === 'Absent';
+            const monAbsent = !monStatus || monStatus === 'Absent';
+            
+            if (satAbsent && monAbsent) {
+              sandwichedLeaves += 1;
+              absentDays += 1;
+            } else {
+              payableDays += 1; // Sunday is a Paid Holiday
+              holidays += 1;
+            }
+          } else {
+            // Weekday with no "Full/Half" record = Absent
+            absentDays += 1;
+          }
+        }
+        
+        // If they worked every single day (inclusive of paid Sundays), 
+        // they get exactly the base monthly salary.
+        const totalPayable = Math.min(payableDays, daysInMonth);
+        const finalSalary = Math.round(totalPayable === daysInMonth ? baseMonthlySalary : totalPayable * dailyRate);
         
         return `
           <div class="month-card">
             <div class="month-header">
               <div class="month-title">${data.name}</div>
-              <div class="month-total">₹${estSalary.toLocaleString('en-IN')}</div>
+              <div class="month-total">₹${finalSalary.toLocaleString('en-IN')}</div>
             </div>
             <div class="stats-grid">
               <div class="stat-item">
-                <div class="stat-lbl">Full Days</div>
-                <div class="stat-val">${data.fullDays}</div>
+                <div class="stat-lbl">Days in Month</div>
+                <div class="stat-val">${daysInMonth}</div>
               </div>
               <div class="stat-item">
-                <div class="stat-lbl">Half Days</div>
-                <div class="stat-val">${data.halfDays}</div>
+                <div class="stat-lbl">Paid Days</div>
+                <div class="stat-val">${payableDays}</div>
               </div>
               <div class="stat-item">
-                <div class="stat-lbl">Payable Days</div>
-                <div class="stat-val">${data.totalDays}</div>
+                <div class="stat-lbl">Unpaid Leaves</div>
+                <div class="stat-val">${absentDays}</div>
               </div>
+            </div>
+            <div style="font-size:11px; color:#666; margin-top:10px; border-top:1px dashed #eee; padding-top:8px;">
+              Includes ${holidays} Sundays (Paid) | ${sandwichedLeaves > 0 ? `<span style="color:red;">${sandwichedLeaves} Sandwiched (Unpaid)</span>` : 'No Sandwiches'}
             </div>
           </div>
         `;

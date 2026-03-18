@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mevrick Solutions - Employee Registration</title>
+    <title>Mevrick Solution - Employee Registration</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -55,6 +55,8 @@
             margin-bottom: 10px;
             font-size: 28px;
             margin-top: 20px;
+
+
         }
 
         h2 {
@@ -147,7 +149,7 @@
 
         button:disabled {
             opacity: 0.6;
-            cursor: not-allowed;
+            cursor: allowed;
             transform: none;
         }
 
@@ -224,8 +226,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="company-logo">MEVRICK SOLUTIONS</div>
-            <div class="company-tagline">Private Limited</div>
+            <div class="company-logo">MEVRICK SOLUTION PRIVATE LIMITED</div>
+            <!-- <div class="company-tagline">Private Limited</div> -->
         </div>
 
         <h1>Employee Online Registration Form</h1>
@@ -446,436 +448,155 @@
 
     <script>
         // Generate Custom Appointment Letter - Matching Exact PDF Format
-        function generateAppointmentLetter(formData) {
+        async function generateAppointmentLetter(formData) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
             const pageWidth = doc.internal.pageSize.width;
             const pageHeight = doc.internal.pageSize.height;
-            const marginLeft = 20;
-            const marginRight = 20;
+
+            // Adjusted margins to fit inside the white "paper" portion of the background image
+            const marginLeft = 38;
+            const marginRight = 38;
             const contentWidth = pageWidth - marginLeft - marginRight;
+            const applyTemplate = async (docObj) => {
+                try {
+                    const response = await fetch('assets/letterhead.png');
+                    const blob = await response.blob();
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            docObj.addImage(reader.result, 'PNG', 0, 0, pageWidth, pageHeight);
+                            resolve();
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (err) {
+                    console.error("Failed to load letterhead image:", err);
+                }
+            };
+            const employeeId = formData.employeeId || `MEV/${Math.floor(Math.random() * 999) + 100}/2024`;
+            const currentDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-            let yPosition = 15;
+            await applyTemplate(doc);
+            doc.setTextColor(20, 20, 20);
+            let yPosition = 75; // Lower Y position to account for the grey padding + header in the image
 
-            // Generate Employee ID
-            const employeeId = formData.employeeId || `MEV/${Math.floor(Math.random() * 999) + 100}/2025`;
-            const currentDate = new Date().toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-
-            // Header - Company Info (exact format from PDF)
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-            doc.text('Webel IT Park, Phase - 2, Kalyani, WB - 741235', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-            doc.text('033-46019562 / +91-8450841207', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-            doc.text('info@mevrick.in', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-            doc.text('www.mevrick.in', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 10;
-
-            // Employee ID and Date
-            doc.setFontSize(10);
-            doc.text(`Employee ID: ${employeeId}`, marginLeft, yPosition);
+            // Header Section
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text(`REF.NO. - ${employeeId}`, marginLeft, yPosition);
             doc.text(`Date: ${currentDate}`, pageWidth - marginRight, yPosition, { align: 'right' });
-            yPosition += 10;
-
-            // Subject
-            doc.setFont(undefined, 'bold');
-            const positionTitle = formData.designation;
-            doc.text(`Subject: Appointment Letter for the Position of ${positionTitle}`, marginLeft, yPosition);
-            yPosition += 10;
-
-            // Salutation
-            doc.setFont(undefined, 'normal');
-            doc.text(`Dear ${formData.employeeName},`, marginLeft, yPosition);
-            yPosition += 10;
-
-            // Opening paragraph - Different for Full Time vs Casual (exact wording from PDFs)
-            if (formData.employeeType === 'Full Time') {
-                const openingText = `We are pleased to appoint you the position of ${positionTitle} with Mevrick Solutions Private Limited on a Full time basis under the terms and conditions set forth in this letter.`;
-                const openingLines = doc.splitTextToSize(openingText, contentWidth);
-                openingLines.forEach(line => {
-                    doc.text(line, marginLeft, yPosition);
-                    yPosition += 5;
-                });
-            } else {
-                const openingText = `We are pleased to offer you the position of ${positionTitle} with Mevrick Solutions Private Limited on a contractual target basis under the terms and conditions set forth in this letter.`;
-                const openingLines = doc.splitTextToSize(openingText, contentWidth);
-                openingLines.forEach(line => {
-                    doc.text(line, marginLeft, yPosition);
-                    yPosition += 5;
-                });
-            }
-            yPosition += 7;
-
-            // 1. Joining Date & Reporting
-            doc.setFont(undefined, 'bold');
-            doc.text('1. Joining Date & Reporting', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const joiningDateFormatted = new Date(formData.joiningDate).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            const joiningDateShort = new Date(formData.joiningDate).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            if (formData.employeeType === 'Full Time') {
-                doc.text(`Your joining date, as per our records, will be ${joiningDateShort} You will report to your`, marginLeft + 5, yPosition);
-                yPosition += 5;
-                doc.text('designated Manager.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                const locationText = `Your initial posting will be at ${formData.workLocation}, however, you may be transferred to any of our offices in India or abroad based on business requirements.`;
-                const locationLines = doc.splitTextToSize(locationText, contentWidth - 5);
-                locationLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            } else {
-                doc.text(`Your joining date, as per our records, will be ${joiningDateShort}.`, marginLeft + 5, yPosition);
-                yPosition += 5;
-                doc.text(`Your initial posting will be at ${formData.workLocation} and is a valued member of our`, marginLeft + 5, yPosition);
-                yPosition += 5;
-                doc.text('Digitization team.', marginLeft + 5, yPosition);
-                yPosition += 5;
-            }
-            yPosition += 5;
-
-            // 2. Compensation
-            doc.setFont(undefined, 'bold');
-            doc.text('2. Compensation', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const monthlyAmount = parseInt(formData.salary);
-            const annualAmount = monthlyAmount * 12;
-
-            if (formData.employeeType === 'Full Time') {
-                const compText = `Your current annual Gross CTC will be ₹ ${annualAmount.toLocaleString('en-IN')} as decided. However, the structure of your compensation plan may be Revised from time to time in accordance with the company's policies, industry practices and market standards.`;
-                const compLines = doc.splitTextToSize(compText, contentWidth - 5);
-                compLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            } else {
-                const compText = `You will receive a fixed monthly salary of ₹${monthlyAmount.toLocaleString('en-IN')}, payable between the 15th and 20th of each month, subject to standard deductions and bank processing timelines.`;
-                const compLines = doc.splitTextToSize(compText, contentWidth - 5);
-                compLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            }
-            yPosition += 5;
-
-            // 3. Confidentiality & Code of Conduct
-            if (yPosition > pageHeight - 50) {
-                doc.addPage();
-                yPosition = 20;
-                doc.setFontSize(9);
-                doc.text('Office: Kolkata(Head Office), Delhi, Mumbai, Telangana', pageWidth / 2, pageHeight - 10, { align: 'center' });
-                doc.setFontSize(10);
-            }
-
-            doc.setFont(undefined, 'bold');
-            doc.text('3. Confidentiality & Code of Conduct', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const confText = 'As a member of our team, you may have access to confidential and proprietary information related to our company, its clients, and partners. You are required to:';
-            const confLines = doc.splitTextToSize(confText, contentWidth - 5);
-            confLines.forEach(line => {
-                doc.text(line, marginLeft + 5, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 2;
-
-            doc.text('Maintain strict confidentiality of all business information.', marginLeft + 6, yPosition);
-            yPosition += 5;
-            const ruleText = 'Adhere to company rules, policies, and procedures, which may be revised from time to time.';
-            const ruleLines = doc.splitTextToSize(ruleText, contentWidth - 6);
-            ruleLines.forEach(line => {
-                doc.text(line, marginLeft + 6, yPosition);
-                yPosition += 5;
-            });
-            doc.text('Avoid any activity that may be deemed as a conflict of interest.', marginLeft + 6, yPosition);
-            yPosition += 7;
-
-            const breachText = 'Any breach of confidentiality or company policies may lead to disciplinary action, including termination of employment and legal proceedings.';
-            const breachLines = doc.splitTextToSize(breachText, contentWidth - 5);
-            breachLines.forEach(line => {
-                doc.text(line, marginLeft + 5, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 5;
-
-            // Add footer to first page
-            doc.setFontSize(9);
-            doc.text('Office: Kolkata(Head Office), Delhi, Mumbai, Telangana', pageWidth / 2, pageHeight - 10, { align: 'center' });
-            doc.setFontSize(10);
-
-            // New Page
-            doc.addPage();
-            yPosition = 20;
-
-            // Page header
-            doc.setFontSize(9);
-            doc.text('Webel IT Park, Phase - 2, Kalyani, WB - 741235', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-            doc.text('033-46019562 / +91-8450841207', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-            doc.text('info@mevrick.in', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 4;
-            doc.text('www.mevrick.in', pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += 10;
-            doc.setFontSize(10);
-
-            // 4. Work & Performance
-            doc.setFont(undefined, 'bold');
-            doc.text('4. Work & Performance', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            if (formData.employeeType === 'Full Time') {
-                doc.text('Develop clean, efficient code and follow company coding standards.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                doc.text('Complete tasks assigned by your Manager/Team Lead within deadlines.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                doc.text('Participate in development, testing, and troubleshooting as required.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                const perfText = 'Performance will be reviewed regularly; failure to meet expectations may lead to corrective actions or termination.';
-                const perfLines = doc.splitTextToSize(perfText, contentWidth - 5);
-                perfLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            } else {
-                doc.text('You will be assigned daily/weekly/monthly targets by your Project Manager.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                const reviewText = 'Your performance will be reviewed based on the achievement of these targets.';
-                const reviewLines = doc.splitTextToSize(reviewText, contentWidth - 5);
-                reviewLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-                const failureText = 'Failure to meet performance standards may lead to corrective measures, warnings, or termination of the contract.';
-                const failureLines = doc.splitTextToSize(failureText, contentWidth - 5);
-                failureLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            }
-            yPosition += 5;
-
-            // 5. Terms of Contract & Termination
-            doc.setFont(undefined, 'bold');
-            doc.text('5. Terms of Contract & Termination', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            if (formData.employeeType === 'Full Time') {
-                doc.text('This appointment is full-time in nature.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                const probText = 'As per company policy, your probation period will be 6 months. During this period, either party may terminate the employment with 1 week\' notice.';
-                const probLines = doc.splitTextToSize(probText, contentWidth - 5);
-                probLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-                const noticeText = 'After the probation period, the notice period for resignation will be 30 days (1 month) on either side.';
-                const noticeLines = doc.splitTextToSize(noticeText, contentWidth - 5);
-                noticeLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            } else {
-                doc.text('This appointment is contractual in nature.', marginLeft + 5, yPosition);
-                yPosition += 5;
-                const noticeText = 'Either party may terminate the contract by providing one (1) week\'s written notice.';
-                const noticeLines = doc.splitTextToSize(noticeText, contentWidth - 5);
-                noticeLines.forEach(line => {
-                    doc.text(line, marginLeft + 5, yPosition);
-                    yPosition += 5;
-                });
-            }
-            yPosition += 2;
-
-            const reserveText = 'The company reserves the right to terminate your employment immediately in case of:';
-            doc.text(reserveText, marginLeft + 5, yPosition);
-            yPosition += 5;
-
-            doc.text('o  Gross misconduct', marginLeft + 10, yPosition);
-            yPosition += 5;
-            doc.text('o  Violation of company rules and regulations', marginLeft + 10, yPosition);
-            yPosition += 5;
-            doc.text('o  Breach of confidentiality', marginLeft + 10, yPosition);
-            yPosition += 5;
-            doc.text('o  Unauthorized absence or negligence', marginLeft + 10, yPosition);
-            yPosition += 5;
-            doc.text('o  Non-performance or failure to achieve assigned targets', marginLeft + 10, yPosition);
-            yPosition += 7;
-
-            // 6. Company Property & Assets
-            doc.setFont(undefined, 'bold');
-            doc.text('6. Company Property & Assets', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const propertyText1 = 'You are not permitted to remove, misuse, or take away any company assets (including documents, equipment, or data) without prior written authorization.';
-            const propertyLines1 = doc.splitTextToSize(propertyText1, contentWidth - 5);
-            propertyLines1.forEach(line => {
-                doc.text(line, marginLeft + 5, yPosition);
-                yPosition += 5;
-            });
-
-            const propertyText2 = 'Any unauthorized removal, damage, or misuse of company property will be treated as a serious offense and may result in legal action in addition to termination.';
-            const propertyLines2 = doc.splitTextToSize(propertyText2, contentWidth - 5);
-            propertyLines2.forEach(line => {
-                doc.text(line, marginLeft + 5, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 5;
-
-            // Footer for page 2
-            doc.setFontSize(9);
-            doc.text('Office: Kolkata(Head Office), Delhi, Mumbai, Telangana', pageWidth / 2, pageHeight - 10, { align: 'center' });
-            doc.setFontSize(10);
-
-            // New Page
-            doc.addPage();
-            yPosition = 20;
-
-            // 7. Non-Payment Policy
-            doc.setFont(undefined, 'bold');
-            doc.text('7. Non-Payment Policy', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const paymentText = 'Employees confirm that they have not made any payments to Mevrick Solutions Pvt. Ltd. in relation to their employment. Any attempt to offer or accept money, gifts, or favors in exchange for employment will be treated as fraudulent activity and will invite strict disciplinary action, including legal consequences.';
-            const paymentLines = doc.splitTextToSize(paymentText, contentWidth);
-            paymentLines.forEach(line => {
-                doc.text(line, marginLeft, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 7;
-
-            // Compensation Breakdown Table
-            const joiningDateTable = new Date(formData.joiningDate).toLocaleDateString('en-GB', {
-                month: 'long',
-                day: 'numeric'
-            });
-
-            const joiningYear = new Date(formData.joiningDate).getFullYear();
-
-            doc.setFont(undefined, 'bold');
-            doc.text(`Compensation Break up with effective from ${joiningDateTable}, ${joiningYear}`, marginLeft, yPosition);
-            yPosition += 5;
-            doc.text(formData.employeeName, marginLeft, yPosition);
             yPosition += 8;
 
-            // Table header
-            doc.setFontSize(10);
+            const positionTitle = (formData.designation || "Web Developer").toUpperCase();
+            doc.setFont(undefined, 'bold');
+            doc.text(`Subject:`, marginLeft, yPosition);
+            doc.setFont(undefined, 'italic');
+            doc.text(` Appointment for the Post of ${positionTitle}`, marginLeft + 14, yPosition);
+            yPosition += 8;
+
             doc.setFont(undefined, 'normal');
-            doc.text('Monthly', marginLeft + 90, yPosition);
-            doc.text('Annual', marginLeft + 140, yPosition);
-            yPosition += 5;
+            doc.text(`Dear ${formData.employeeName},`, marginLeft, yPosition);
+            yPosition += 8;
 
-            // Table data
-            if (formData.employeeType === 'Full Time') {
-                doc.text('Basic', marginLeft, yPosition);
-                doc.text(monthlyAmount.toLocaleString('en-IN') + '.00', marginLeft + 90, yPosition);
-                doc.text(annualAmount.toLocaleString('en-IN') + '.00', marginLeft + 140, yPosition);
-                yPosition += 5;
-                doc.setFont(undefined, 'bold');
-                doc.text('Gross Salary', marginLeft, yPosition);
-                doc.text(monthlyAmount.toLocaleString('en-IN') + '.00', marginLeft + 90, yPosition);
-                doc.text(annualAmount.toLocaleString('en-IN') + '.00', marginLeft + 140, yPosition);
-            } else {
-                const basic = Math.floor(monthlyAmount * 0.9375); // 93.75%
-                const performanceBonus = monthlyAmount - basic;
+            const monthlySalary = parseInt(formData.salary) || 15000;
+            const annualCTC = (monthlySalary * 12).toLocaleString('en-IN');
 
-                doc.text('Basic', marginLeft, yPosition);
-                doc.text(basic.toLocaleString('en-IN') + '.00', marginLeft + 90, yPosition);
-                doc.text((basic * 12).toLocaleString('en-IN') + '.00', marginLeft + 140, yPosition);
-                yPosition += 5;
-                doc.text('Performance bonus', marginLeft, yPosition);
-                doc.text(performanceBonus.toLocaleString('en-IN') + '.00', marginLeft + 90, yPosition);
-                doc.text((performanceBonus * 12).toLocaleString('en-IN') + '.00', marginLeft + 140, yPosition);
-                yPosition += 5;
-                doc.setFont(undefined, 'bold');
-                doc.text('Gross Salary', marginLeft, yPosition);
-                doc.text(monthlyAmount.toLocaleString('en-IN') + '.00', marginLeft + 90, yPosition);
-                doc.text(annualAmount.toLocaleString('en-IN') + '.00', marginLeft + 140, yPosition);
+            const jDate = formData.joiningDate ? new Date(formData.joiningDate) : new Date();
+            const ordinal = (n) => n + (n > 10 && n < 20 ? 'th' : { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+            const jDateStr = `${ordinal(jDate.getDate())} ${jDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`;
+
+            const expiryDate = new Date(jDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+            const expiryStr = `${expiryDate.toLocaleDateString('en-GB', { month: 'long' })} ${ordinal(expiryDate.getDate())}, ${expiryDate.getFullYear()}`;
+
+            const paragraphs = [
+                `We are delighted to extend an offer to you to join MEVRICK SOLUTION PVT. LTD. in the capacity of ${positionTitle}, effective from your anticipated start date of ${jDateStr}.`,
+                `Your current annual Gross CTC will be INR ${annualCTC}. Please note that the structure of your compensation plan may be subject to adjustments in accordance with our Compensation policy and practices.`,
+                `You will be subject to Six months probation period. During this time, the notice period for resignation will be 15 days on either side. Upon successful completion of the probation period, the notice period for resignation will be 30 days/01 month on either side.`,
+                `Your primary place of work will be at the address mentioned above. However, you may be required to relocate to any of our offices in India or abroad as per business requirements.`,
+                `As an employee of MEVRICK SOLUTION PVT. LTD., you may have access to confidential and proprietary information pertaining to our operations, products, and services, as well as those of our clients. To safeguard the interests of all parties involved, you will be required to review and sign an Employment Agreement prior to your commencement of employment.`,
+                `You are expected to adhere to the rules and regulations of the Company, and any violation thereof may result in disciplinary action.`,
+                `Your appointment is contingent upon satisfactory reference checks and clearance from any existing secrecy or service agreements.`,
+                `Please note that this offer is based on the information provided in your application and interviews. Any discrepancy found in this information may result in the termination of your employment without notice. This letter is valid until ${expiryStr} and failure to confirm acceptance by this date may result in the withdrawal of the offer.`,
+                `Your daily tasks and targets will be provided by your Supervisor.`,
+                `We eagerly anticipate your contributions to the growth of our organization and your professional development. Upon joining, please bring the following documents for verification/submission:`,
+                `- Original and copies of educational certificates and mark sheets.`,
+                `- Relieving letter & experience certificate from previous employer[s].`,
+                `- Salary certificate from previous employer.`,
+                `- Original & copy of your passport.`,
+                `- Three passport size photographs.`
+            ];
+
+            doc.setFontSize(8.5);
+            const lineSpacing = 4.2;
+
+            // RENDERING SINGLE PAGE TEXT
+            for (let i = 0; i < paragraphs.length; i++) {
+                const text = paragraphs[i];
+                const lines = doc.splitTextToSize(text, contentWidth);
+
+                for (let j = 0; j < lines.length; j++) {
+                    const line = lines[j];
+                    let xOff = marginLeft;
+
+                    if (i === 0) { // First Paragraph Highlights
+                        let words = line.split(' ');
+                        for (let word of words) {
+                            const isDesig = word.toLowerCase().includes(positionTitle.toLowerCase().split(' ')[0]);
+                            const isDate = word.includes(jDateStr.split(' ')[1]) || word.match(/\d+st|\d+nd|\d+rd|\d+th/);
+
+                            if (isDesig) doc.setFont('helvetica', 'bolditalic');
+                            else if (isDate) doc.setFont('helvetica', 'italic');
+                            else doc.setFont('helvetica', 'normal');
+
+                            doc.text(word + ' ', xOff, yPosition);
+                            xOff += doc.getTextWidth(word + ' ');
+                        }
+                    } else if (i === 7) { // Offer Validity Date
+                        let words = line.split(' ');
+                        for (let word of words) {
+                            if (word.includes(expiryStr.split(' ')[0]) || word.match(/\d+st|\d+nd|\d+rd|\d+th/)) {
+                                doc.setFont('helvetica', 'italic');
+                            } else {
+                                doc.setFont('helvetica', 'normal');
+                            }
+                            doc.text(word + ' ', xOff, yPosition);
+                            xOff += doc.getTextWidth(word + ' ');
+                        }
+                    } else {
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(line, marginLeft, yPosition, { align: 'justify' });
+                    }
+                    yPosition += lineSpacing;
+                }
+                yPosition += 2.2;
             }
-            yPosition += 10;
 
-            // 8. Acceptance of Terms
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'bold');
-            doc.text('8. Acceptance of Terms', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const acceptText = 'By signing this letter, you acknowledge that you have read, understood, and agreed to abide by the above terms and conditions of employment. You further agree that any violation of these terms may result in disciplinary action, termination, and/or legal action as deemed appropriate by the company.';
-            const acceptLines = doc.splitTextToSize(acceptText, contentWidth);
-            acceptLines.forEach(line => {
-                doc.text(line, marginLeft, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 5;
-
-            const welcomeText = 'We welcome you to Mevrick Solutions Private Limited and look forward to your valuable contribution to the growth of the organization and your own professional development.';
-            const welcomeLines = doc.splitTextToSize(welcomeText, contentWidth);
-            welcomeLines.forEach(line => {
-                doc.text(line, marginLeft, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 10;
-
-            // 9. Acknowledgement & Acceptance
-            doc.setFont(undefined, 'bold');
-            doc.text('9. Acknowledgement & Acceptance', marginLeft, yPosition);
-            yPosition += 6;
-            doc.setFont(undefined, 'normal');
-
-            const ackText = `I, ${formData.employeeName}, accept the appointment as ${positionTitle} ${formData.employeeType === 'Full Time' ? '(Full-Time)' : ''} at Mevrick Solutions Pvt. Ltd. and agree to abide by the terms and conditions stated above.`;
-            const ackLines = doc.splitTextToSize(ackText, contentWidth);
-            ackLines.forEach(line => {
-                doc.text(line, marginLeft, yPosition);
-                yPosition += 5;
-            });
-            yPosition += 15;
-
-            // Signatures
+            // Signature Section
+            yPosition = Math.max(yPosition, pageHeight - 85);
+            doc.setFont('helvetica', 'normal');
             doc.text('Sincerely,', marginLeft, yPosition);
-            yPosition += 7;
-            doc.setFont(undefined, 'normal');
-            doc.text('Authorized Pepresentative', marginLeft, yPosition);
-            yPosition += 5;
-            doc.setFont(undefined, 'bold');
+            yPosition += 6;
+            doc.setFont('helvetica', 'bold');
             doc.text('For MEVRICK SOLUTION PVT LTD', marginLeft, yPosition);
 
-            yPosition -= 12;
-            doc.setFont(undefined, 'normal');
-            doc.text('AUTHORIZED SIGNATORY', pageWidth - marginRight - 60, yPosition, { align: 'center' });
-            yPosition += 5;
-            doc.text('EMPLOYEE ACCEPTANCE SIGNATURE', pageWidth - marginRight - 60, yPosition, { align: 'center' });
+            // Stamp
+            const stompX = marginLeft + 2;
+            doc.setTextColor(110, 110, 190);
+            doc.setFontSize(7.5);
+            doc.text('MEVRICK SOLUTION PVT. LTD.', stompX, yPosition + 4.5);
+            doc.setDrawColor(110, 110, 190);
+            doc.setLineWidth(0.3);
+            doc.line(stompX + 5, yPosition + 11, stompX + 22, yPosition + 11);
+            doc.text('DIRECTOR', stompX + 7, yPosition + 16);
 
-            yPosition += 10;
-            doc.setFontSize(9);
-            doc.text('Office: Kolkata(Head Office), Delhi, Mumbai, Telangana', pageWidth / 2, pageHeight - 10, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text('Authorized Signatory', marginLeft, pageHeight - 40);
+            doc.text('Acceptance Signature', pageWidth - marginRight, pageHeight - 40, { align: 'right' });
 
-            doc.save(`Appointment_Letter_${employeeId.replace(/\//g, '_')}.pdf`);
             return doc;
         }
 
@@ -895,189 +616,118 @@
 
             const employeeId = `MEV/${Math.floor(Math.random() * 999) + 100}/2025`;
 
-            const formData = {
-                employeeId: employeeId,
-                employeeName: document.getElementById('employeeName').value,
-                employeeEmail: document.getElementById('employeeEmail').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
-                alternativePhone: document.getElementById('alternativePhone').value,
-                dob: document.getElementById('dob').value,
-                age: document.getElementById('age').value,
-                maritalStatus: document.getElementById('maritalStatus').value,
-                bloodGroup: document.getElementById('bloodGroup').value,
-                address: document.getElementById('address').value,
-                nomineeName: document.getElementById('nomineeName').value,
-                nomineePhone: document.getElementById('nomineePhone').value,
-                bankName: document.getElementById('bankName').value,
-                branchName: document.getElementById('branchName').value,
-                accountNumber: document.getElementById('accountNumber').value,
-                ifscCode: document.getElementById('ifscCode').value,
-                branchCode: document.getElementById('branchCode').value,
-                upiId: document.getElementById('upiId').value,
-                employeeType: document.getElementById('employeeType').value,
-                salary: document.getElementById('salary').value,
-                designation: document.getElementById('designation').value,
-                joiningDate: document.getElementById('joiningDate').value,
-                workLocation: document.getElementById('workLocation').value
-            };
-
             try {
-                // Generate Appointment Letter PDF (downloaded locally)
-                generateAppointmentLetter(formData);
-
-                // ✅ SAVE TO BACKEND DATABASE (SQLite via Node.js)
-                const response = await fetch('http://localhost:3000/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                // 1. Generate Appointment Letter PDF
+                const doc = await generateAppointmentLetter({
+                    ...Object.fromEntries(new FormData(document.getElementById('registrationForm'))),
+                    employeeId: employeeId
                 });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Backend save failed');
+                const appointmentBlob = doc.output('blob');
 
-                // Also save to local storage as a backup
+                // 2. Prepare FormData for Multiparts Upload
+                const fd = new FormData();
+                const formInputs = document.getElementById('registrationForm').elements;
+                for (let i = 0; i < formInputs.length; i++) {
+                    const input = formInputs[i];
+                    if (input.name && input.type !== 'file') {
+                        fd.append(input.name, input.value);
+                    }
+                }
+                fd.append('employeeId', employeeId);
+
+                // Add files from form
+                const cvFile = document.getElementById('cvResume').files[0];
+                const idFile = document.getElementById('idProof').files[0];
+                const bankFile = document.getElementById('bankPassbook').files[0];
+                const marksheetFile = document.getElementById('marksheet').files[0];
+
+                if (cvFile) fd.append('cvResume', cvFile);
+                if (idFile) fd.append('idProof', idFile);
+                if (bankFile) fd.append('bankPassbook', bankFile);
+                if (marksheetFile) fd.append('marksheet', marksheetFile);
+
+                // Add generated PDF
+                fd.append('appointmentLetter', appointmentBlob, `Appointment_Letter_${employeeId.replace(/\//g, '_')}.pdf`);
+
+                const formData = Object.fromEntries(fd.entries());
+
+                // ALWAYS download the PDF for the user immediately
+                doc.save(`Appointment_Letter_${employeeId.replace(/\//g, '_')}.pdf`);
+
+                // 3. Attempt Server Save
+                try {
+                    const response = await fetch('http://127.0.0.1:3000/api/register', {
+                        method: 'POST',
+                        body: fd
+                    });
+
+                    if (!response.ok) {
+                        const result = await response.json();
+                        throw new Error(result.error || 'Server save failed');
+                    }
+                } catch (fetchError) {
+                    console.warn("Backend save failed, continuing with local persistence:", fetchError);
+                    // We don't throw here so the user still gets local success feedback
+                }
+
+                // 4. Local Persistence (LocalStorage & Excel)
                 const LS_DB = "mevtencia_employeeDatabase";
                 let employeeDatabase = JSON.parse(localStorage.getItem(LS_DB) || "{}");
-                employeeDatabase[employeeId] = {
-                    id: employeeId,
-                    name: formData.employeeName,
-                    email: formData.employeeEmail,
-                    department: "Unassigned",
-                    workMode: "Work From Office",
-                    mailApproved: false,
-                    ...formData
-                };
+                employeeDatabase[employeeId] = { id: employeeId, ...formData };
                 localStorage.setItem(LS_DB, JSON.stringify(employeeDatabase));
 
-
-                // Save to Excel
+                // Excel data
                 const excelData = {
                     'Registration Date': new Date().toLocaleDateString('en-IN'),
-                    'Registration Time': new Date().toLocaleTimeString('en-IN'),
                     'Employee ID': employeeId,
                     'Employee Name': formData.employeeName,
                     'Employee Email': formData.employeeEmail,
-                    'Phone Number': formData.phoneNumber,
-                    'Alternative Phone': formData.alternativePhone,
-                    'Age': formData.age,
-                    'Date of Birth': formData.dob,
-                    'Marital Status': formData.maritalStatus,
-                    'Blood Group': formData.bloodGroup,
-                    'Address': formData.address,
-                    'Nominee Name': formData.nomineeName,
-                    'Nominee Phone': formData.nomineePhone,
-                    'Bank Name': formData.bankName,
-                    'Branch Name': formData.branchName,
-                    'Account Number': formData.accountNumber,
-                    'IFSC Code': formData.ifscCode,
-                    'Branch Code': formData.branchCode || 'N/A',
-                    'UPI ID': formData.upiId || 'N/A',
-                    'Employee Type': formData.employeeType,
                     'Designation': formData.designation,
                     'Monthly Salary (₹)': formData.salary,
-                    'Annual CTC (₹)': parseInt(formData.salary) * 12,
                     'Joining Date': formData.joiningDate,
-                    'Work Location': formData.workLocation,
-                    'CV/Resume': document.getElementById('cvResume').files[0]?.name || 'Not uploaded',
-                    'ID Proof': document.getElementById('idProof').files[0]?.name || 'Not uploaded',
-                    'Bank Passbook': document.getElementById('bankPassbook').files[0]?.name || 'Not uploaded',
-                    'Marksheet': document.getElementById('marksheet').files[0]?.name || 'Not uploaded'
+                    'Work Location': formData.workLocation
                 };
 
-                // Load existing data
                 let existingData = [];
                 const existingFile = localStorage.getItem('mevrickEmployeeRegistrations');
                 if (existingFile) {
                     try {
                         const workbook = XLSX.read(existingFile, { type: 'string' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        existingData = XLSX.utils.sheet_to_json(firstSheet);
-                    } catch (e) {
-                        console.error('Error reading existing data:', e);
-                    }
+                        existingData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    } catch (e) { }
                 }
-
                 existingData.push(excelData);
-
-                // Create Excel file
                 const ws = XLSX.utils.json_to_sheet(existingData);
-
-                // Set column widths
-                ws['!cols'] = [
-                    { wch: 15 }, // Registration Date
-                    { wch: 15 }, // Registration Time
-                    { wch: 15 }, // Employee ID
-                    { wch: 25 }, // Employee Name
-                    { wch: 30 }, // Employee Email
-                    { wch: 15 }, // Phone Number
-                    { wch: 15 }, // Alternative Phone
-                    { wch: 8 },  // Age
-                    { wch: 12 }, // DOB
-                    { wch: 15 }, // Marital Status
-                    { wch: 12 }, // Blood Group
-                    { wch: 40 }, // Address
-                    { wch: 25 }, // Nominee Name
-                    { wch: 15 }, // Nominee Phone
-                    { wch: 20 }, // Bank Name
-                    { wch: 20 }, // Branch Name
-                    { wch: 20 }, // Account Number
-                    { wch: 15 }, // IFSC Code
-                    { wch: 12 }, // Branch Code
-                    { wch: 20 }, // UPI ID
-                    { wch: 15 }, // Employee Type
-                    { wch: 25 }, // Designation
-                    { wch: 15 }, // Monthly Salary
-                    { wch: 15 }, // Annual CTC
-                    { wch: 15 }, // Joining Date
-                    { wch: 20 }, // Work Location
-                    { wch: 25 }, // CV/Resume
-                    { wch: 25 }, // ID Proof
-                    { wch: 25 }, // Bank Passbook
-                    { wch: 25 }  // Marksheet
-                ];
-
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Employee Registrations');
-                
-                // Write and save to localStorage for persistence across reloads
-                const wboutStr = XLSX.write(wb, { bookType: 'xlsx', type: 'string' });
-                localStorage.setItem('mevrickEmployeeRegistrations', wboutStr);
-                
-                // Keep the download commented out per original script unless we want it, 
-                // but usually good to give the admin the file. We leave it as requested.
+                XLSX.utils.book_append_sheet(wb, ws, 'Employees');
+                localStorage.setItem('mevrickEmployeeRegistrations', XLSX.write(wb, { bookType: 'xlsx', type: 'string' }));
 
-                // Show success message
-                        successMsg.innerHTML = `
-                            <div style="text-align: center; padding: 10px;">
-                                <strong style="font-size: 20px;">✅ Registration Successful!</strong><br><br>
-                                <strong>Welcome to Mevrick Solutions, ${formData.employeeName}!</strong><br><br>
-                                📄 Your appointment letter has been generated and downloaded<br>
-                                📊 Registration data saved to Database<br>
-                                💼 Employment Type: ${formData.employeeType}<br>
-                                📍 Work Location: ${formData.workLocation}<br>
-                                📅 Joining Date: ${new Date(formData.joiningDate).toLocaleDateString('en-IN')}<br><br>
-                                <a href="EmployeeHistory.html" style="display: inline-block; background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">👥 View Registration History</a>
-                                <br>
-                                <small style="color: #856404; background: #fff3cd; padding: 8px; display: block; border-radius: 4px; text-align: left;">
-                                    <strong>Note:</strong> To enable automatic email delivery, 
-                                    please configure EmailJS in the code.
-                                </small>
-                            </div>
-                        `;
+                // 5. Success Feedback
+                successMsg.innerHTML = `
+                    <div style="text-align: center; padding: 10px;">
+                        <strong style="font-size: 20px;">✅ Registration Successful!</strong><br><br>
+                        <strong>Welcome to Mevrick Solutions, ${formData.employeeName}!</strong><br><br>
+                        📄 Your appointment letter has been generated and downloaded.<br>
+                        💼 Employment Type: ${formData.employeeType}<br>
+                        📍 Work Location: ${formData.workLocation}<br>
+                        📅 Joining Date: ${new Date(formData.joiningDate).toLocaleDateString('en-IN')}<br><br>
+                        <a href="EmployeeHistory.html" style="display: inline-block; background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">👥 View Registration History</a>
+                    </div>
+                `;
                 successMsg.style.display = 'block';
-
-                // Reset form
                 document.getElementById('registrationForm').reset();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (error) {
-                errorMsg.innerHTML = `<strong>❌ Error:</strong> ${error.message}<br><br>Please try again or contact support.`;
+                errorMsg.innerHTML = `<strong>❌ Error:</strong> ${error.message}<br><br>PDF generation failed. Please check the form and try again.`;
                 errorMsg.style.display = 'block';
-                console.error('Error:', error);
+                console.error('Final Error:', error);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } finally {
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
             }
+
         });
 
         // Helper functions
@@ -1106,6 +756,7 @@
             let age = today.getFullYear() - dob.getFullYear();
             const monthDiff = today.getMonth() - dob.getMonth();
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+
                 age--;
             }
             document.getElementById('age').value = age;
@@ -1127,4 +778,5 @@
         document.getElementById('joiningDate').min = new Date().toISOString().split('T')[0];
     </script>
 </body>
+
 </html>

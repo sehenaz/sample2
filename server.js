@@ -3,6 +3,8 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,11 +15,30 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Database Setup
-const fs = require('fs');
 const persistenceDir = process.env.PERSISTENCE_DIR || __dirname;
 if (persistenceDir !== __dirname && !fs.existsSync(persistenceDir)) {
   fs.mkdirSync(persistenceDir, { recursive: true });
 }
+
+// Uploads Directory Setup
+const uploadsDir = path.join(persistenceDir, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir));
+
+// Multer Storage Configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
 const dbPath = path.join(persistenceDir, 'attendance.db');
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
@@ -68,20 +89,34 @@ const db = new sqlite3.Database(dbPath, (err) => {
         designation TEXT,
         joining_date TEXT,
         work_location TEXT,
+        cv_resume TEXT,
+        id_proof TEXT,
+        bank_passbook TEXT,
+        marksheet TEXT,
+        appointment_letter TEXT,
         registered_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
 
-    // Migration: Add lat/lng columns if they don't exist
+    // Migration: Add columns if they don't exist
     db.serialize(() => {
+      // Attendance migrations
       db.all("PRAGMA table_info(attendance)", [], (err, rows) => {
         if (err) return;
         const cols = rows.map(r => r.name);
-        if (!cols.includes('lat')) {
-          db.run("ALTER TABLE attendance ADD COLUMN lat REAL");
-        }
-        if (!cols.includes('lng')) {
-          db.run("ALTER TABLE attendance ADD COLUMN lng REAL");
-        }
+        if (!cols.includes('lat')) db.run("ALTER TABLE attendance ADD COLUMN lat REAL");
+        if (!cols.includes('lng')) db.run("ALTER TABLE attendance ADD COLUMN lng REAL");
+      });
+
+      // Employees migrations
+      db.all("PRAGMA table_info(employees)", [], (err, rows) => {
+        if (err) return;
+        const cols = rows.map(r => r.name);
+        const docCols = ['cv_resume', 'id_proof', 'bank_passbook', 'marksheet', 'appointment_letter'];
+        docCols.forEach(col => {
+          if (!cols.includes(col)) {
+            db.run(`ALTER TABLE employees ADD COLUMN ${col} TEXT`);
+          }
+        });
       });
     });
   }
@@ -93,8 +128,14 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // EMPLOYEE REGISTRATION
 // ========================
 
-// Register a new Employee
-app.post('/api/register', (req, res) => {
+// Register a new Employee (Multipart for weights)
+app.post('/api/register', upload.fields([
+  { name: 'cvResume', maxCount: 1 },
+  { name: 'idProof', maxCount: 1 },
+  { name: 'bankPassbook', maxCount: 1 },
+  { name: 'marksheet', maxCount: 1 },
+  { name: 'appointmentLetter', maxCount: 1 }
+]), (req, res) => {
   const {
     employeeId, employeeName, employeeEmail, phoneNumber, alternativePhone,
     dob, age, maritalStatus, bloodGroup, address,
@@ -111,20 +152,29 @@ app.post('/api/register', (req, res) => {
 
   const emp_id = employeeId || `MEV/${Math.floor(Math.random() * 999) + 100}/2025`;
 
+  // Get file paths
+  const cv_resume = req.files['cvResume'] ? `/uploads/${req.files['cvResume'][0].filename}` : null;
+  const id_proof = req.files['idProof'] ? `/uploads/${req.files['idProof'][0].filename}` : null;
+  const bank_passbook = req.files['bankPassbook'] ? `/uploads/${req.files['bankPassbook'][0].filename}` : null;
+  const marksheet = req.files['marksheet'] ? `/uploads/${req.files['marksheet'][0].filename}` : null;
+  const appointment_letter = req.files['appointmentLetter'] ? `/uploads/${req.files['appointmentLetter'][0].filename}` : null;
+
   db.run(
-    `INSERT OR IGNORE INTO employees (
+    `INSERT OR REPLACE INTO employees (
       emp_id, employee_name, employee_email, phone_number, alternative_phone,
       dob, age, marital_status, blood_group, address,
       nominee_name, nominee_phone, bank_name, branch_name,
       account_number, ifsc_code, branch_code, upi_id,
-      employee_type, salary, designation, joining_date, work_location
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      employee_type, salary, designation, joining_date, work_location,
+      cv_resume, id_proof, bank_passbook, marksheet, appointment_letter
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
       emp_id, employeeName, employeeEmail, phoneNumber, alternativePhone,
       dob, age, maritalStatus, bloodGroup, address,
       nomineeName, nomineePhone, bankName, branchName,
       accountNumber, ifscCode, branchCode, upiId,
-      employeeType, salary, designation, joiningDate, workLocation
+      employeeType, salary, designation, joiningDate, workLocation,
+      cv_resume, id_proof, bank_passbook, marksheet, appointment_letter
     ],
     function (err) {
       if (err) {
@@ -209,7 +259,6 @@ app.get('/api/attendance', (req, res) => {
 // Get Attendance for specific Employee
 app.get('/api/attendance/:emp_id', (req, res) => {
   let emp_id = req.params.emp_id;
-  // If emp_id looks like a prefix due to a slash in the ID, try to get the full id from the query or a wildcard
   db.all(`SELECT * FROM attendance WHERE emp_id = ? ORDER BY date DESC`, [emp_id], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
@@ -226,9 +275,10 @@ app.get('/api/employee-attendance', (req, res) => {
   });
 });
 
-// Serve frontend if needed (optional)
+// Serve frontend if needed
 app.use(express.static(__dirname));
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+

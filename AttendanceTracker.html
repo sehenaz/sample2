@@ -744,63 +744,103 @@
       const now = new Date();
       const monthPrefix = String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
       
-      // Calculate month details
       const totalMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       document.getElementById('monthDays').textContent = totalMonthDays;
 
-      // This month records
       const thisMonthRecs = records.filter(r => r.date && r.date.endsWith(monthPrefix));
+      const attMap = {};
+      thisMonthRecs.forEach(r => {
+        const day = parseInt(r.date.split('/')[0]);
+        attMap[day] = r.attendance_type;
+      });
       
+      let payableDays = 0;
+      let absentDays = 0;
+      let holidays = 0;
+      let sandwiches = 0;
       let presentFull = 0;
       let presentHalf = 0;
-      
-      thisMonthRecs.forEach(r => {
-        if (r.attendance_type === 'Full Day') presentFull++;
-        else if (r.attendance_type && r.attendance_type.includes('Half')) presentHalf++;
-      });
 
-      const workedDaysValue = presentFull + (presentHalf * 0.5);
-      // We assume every day is a working day for simplicity, or we could subtract Sundays. 
-      // Based on user prompt "absecent day wise count", we use total calendar days.
-      const absentDays = totalMonthDays - workedDaysValue;
+      for (let day = 1; day <= totalMonthDays; day++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), day);
+        const isSunday = d.getDay() === 0;
+        const status = attMap[day];
 
-      document.getElementById('workDaysCount').textContent = workedDaysValue;
-      document.getElementById('absentDaysCount').textContent = absentDays.toFixed(1);
+        // Only calculate up to today for accurate estimation
+        if (day > now.getDate()) continue;
 
-      // Fetch base salary from backend
-      let monthlySalary = 0;
+        if (status === 'Full Day') {
+          payableDays += 1;
+          presentFull += 1;
+        } else if (status && status.includes('Half')) {
+          payableDays += 0.5;
+          absentDays += 0.5;
+          presentHalf += 1;
+        } else if (isSunday) {
+          const satStatus = attMap[day - 1];
+          const monStatus = attMap[day + 1];
+          if ((!satStatus || satStatus === 'Absent') && (!monStatus || monStatus === 'Absent')) {
+            sandwiches += 1;
+            absentDays += 1;
+          } else {
+            payableDays += 1;
+            holidays += 1;
+          }
+        } else {
+          absentDays += 1;
+        }
+      }
+
+      let monthlySalary = 15000;
       try {
-        const resp = await fetch('http://localhost:3000/api/employees');
+        const resp = await fetch('/api/employees');
         if (resp.ok) {
-          const allEmps = await resp.json();
-          const me = allEmps.find(e => e.emp_id === session.id);
+          const emps = await resp.json();
+          const me = emps.find(e => e.emp_id === session.id);
           if (me && me.salary) monthlySalary = parseInt(me.salary);
         }
-      } catch (e) { console.warn("Could not fetch salary from backend", e); }
+      } catch (e) { }
 
-      if (monthlySalary > 0) {
-        document.getElementById('salaryDetails').innerHTML = `
-          Base Salary: <strong>₹${monthlySalary.toLocaleString('en-IN')}/mo</strong><br>
-          Worked: <strong id="workDaysCount">${workedDaysValue}</strong> / <span id="monthDays">${totalMonthDays}</span> days<br>
-          Absent: <strong id="absentDaysCount">${absentDays.toFixed(1)}</strong> days<br>
-          <small>(Formula: Worked / Total Month Days × Base Salary)</small>
-        `;
-        const payout = (worked_days_val, total_days, base) => Math.round((worked_days_val / total_days) * base);
-        document.getElementById('salaryPayout').textContent = '₹' + payout(workedDaysValue, totalMonthDays, monthlySalary).toLocaleString('en-IN');
-      }
+      // Look up manual salary set from AddEmployee or Registration locally
+      try {
+        const lsDB = JSON.parse(localStorage.getItem('mevtencia_employeeDatabase') || '{}');
+        let localEmp = lsDB[session.id];
+        if (!localEmp) {
+          localEmp = Object.values(lsDB).find(e => e.id === session.id || e.employeeId === session.id);
+        }
+        if (localEmp && localEmp.salary) {
+          monthlySalary = parseInt(localEmp.salary);
+        }
+      } catch (e) { }
+
+      const dailyRate = monthlySalary / totalMonthDays;
+      const estimatedPayout = Math.round(payableDays >= now.getDate() ? (payableDays / now.getDate()) * ((now.getDate()/totalMonthDays) * monthlySalary) : payableDays * dailyRate);
+      
+      // Update UI
+      document.getElementById('salaryPayout').textContent = '₹' + Math.round(payableDays * dailyRate).toLocaleString('en-IN');
+      document.getElementById('workDaysCount').textContent = payableDays;
+      document.getElementById('absentDaysCount').textContent = absentDays.toFixed(1);
+      
+      document.getElementById('salaryDetails').innerHTML = `
+        Base Salary: <strong>₹${monthlySalary.toLocaleString('en-IN')}</strong><br>
+        Paid Days (YTD): <strong>${payableDays}</strong> / ${now.getDate()}<br>
+        Sundays: <strong>${holidays}</strong> | Sandwiches: <strong style="color:red;">${sandwiches}</strong><br>
+        <small>(Formula: Paid Days × Daily Rate of Current Month)</small>
+      `;
 
       // Render Chart
       const ctx = document.getElementById('attendanceChart').getContext('2d');
       if (attChart) attChart.destroy();
       
       attChart = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
-          labels: ['Full Day', 'Half Day', 'Absent'],
+          labels: ['Full Day', 'Half Day', 'Absent (incl. Sandwiches)'],
           datasets: [{
             data: [presentFull, presentHalf, absentDays],
             backgroundColor: ['#10b981', '#fbbf24', '#f43f5e'],
-            borderWidth: 0
+            borderWidth: 0,
+            hoverOffset: 4
           }]
         },
         options: {
@@ -809,7 +849,8 @@
           plugins: {
             legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } },
             title: { display: true, text: 'Attendance Share (Current Month)', font: { size: 13, weight: 'bold' }, color: '#3f51b5' }
-          }
+          },
+          cutout: '65%'
         }
       });
     }

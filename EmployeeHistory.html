@@ -93,7 +93,7 @@
     <div class="header-card">
       <div>
         <h2>👥 Employee Registration History</h2>
-        <p>All registered employees · Mevrick Solution Pvt. Ltd.</p>
+        <p>All registered employees · MEVRICK SOLUTIONS PRIVATE LIMITED</p>
       </div>
       <a href="Registration.html" style="background:#3f51b5;color:white;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;">+ New Registration</a>
     </div>
@@ -119,7 +119,10 @@
 
     <div class="table-container">
       <div class="table-header">
-        <h3>Registered Employees</h3>
+        <div style="display: flex; align-items: center; gap: 10px;">
+           <h3>Registered Employees</h3>
+           <span id="serverStatus" style="font-size: 10px; padding: 4px 8px; border-radius: 4px; background: #ffebee; color: #c62828; font-weight: bold;">✕ Server Offline</span>
+        </div>
         <span class="record-count" id="recordCount">— records</span>
       </div>
       <table>
@@ -166,13 +169,74 @@
     };
 
     async function loadData() {
+      let backendData = [];
       try {
-        const resp = await fetch('http://localhost:3000/api/employees');
-        if (!resp.ok) throw new Error('API error');
-        allData = await resp.json();
-        renderTable();
+        const resp = await fetch('http://127.0.0.1:3000/api/employees');
+        if (resp.ok) {
+          backendData = await resp.json();
+          document.getElementById('serverStatus').textContent = '✓ Server Online';
+          document.getElementById('serverStatus').style.background = '#e8f5e9';
+          document.getElementById('serverStatus').style.color = '#2e7d32';
+        }
       } catch (e) {
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" class="empty-state">⚠️ Could not load data. Make sure the server is running.<br><small>${e.message}</small></td></tr>`;
+        console.warn('Backend fetch failed, relying on local storage:', e);
+        document.getElementById('serverStatus').textContent = '✕ Server Offline (Port 3000)';
+      }
+
+      let localData = [];
+      try {
+        const lsStr = localStorage.getItem('mevtencia_employeeDatabase');
+        if (lsStr) {
+          localData = Object.values(JSON.parse(lsStr)).map(obj => ({
+            emp_id: obj.employeeId || obj.id,
+            employee_name: obj.employeeName,
+            employee_email: obj.employeeEmail,
+            phone_number: obj.phoneNumber,
+            alternative_phone: obj.alternativePhone,
+            dob: obj.dob,
+            age: obj.age,
+            marital_status: obj.maritalStatus,
+            blood_group: obj.bloodGroup,
+            address: obj.address,
+            nominee_name: obj.nomineeName,
+            nominee_phone: obj.nomineePhone,
+            bank_name: obj.bankName,
+            branch_name: obj.branchName,
+            account_number: obj.accountNumber,
+            ifsc_code: obj.ifscCode,
+            branch_code: obj.branchCode,
+            upi_id: obj.upiId,
+            employee_type: obj.employeeType || obj.employee_type,
+            salary: obj.salary,
+            designation: obj.designation,
+            joining_date: obj.joiningDate || obj.joining_date,
+            work_location: obj.workLocation || obj.work_location,
+            cv_resume: obj.cvResume || obj.cv_resume,
+            id_proof: obj.idProof || obj.id_proof,
+            bank_passbook: obj.bankPassbook || obj.bank_passbook,
+            marksheet: obj.marksheet || obj.marksheet,
+            appointment_letter: obj.appointmentLetter || obj.appointment_letter,
+            registered_at: obj.registered_at || new Date().toISOString()
+          }));
+        }
+      } catch (e) {
+        console.warn('Local storage load failed:', e);
+      }
+
+      const mergedMap = new Map();
+      backendData.forEach(r => mergedMap.set(r.emp_id, r));
+      localData.forEach(r => {
+        if (!mergedMap.has(r.emp_id)) {
+          mergedMap.set(r.emp_id, r);
+        }
+      });
+      
+      allData = Array.from(mergedMap.values());
+
+      if (allData.length === 0) {
+         document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" class="empty-state">No employees registered yet. <a href="Registration.html">Register one now →</a></td></tr>`;
+      } else {
+         renderTable();
       }
     }
 
@@ -239,21 +303,115 @@
         '🏠 Address': { 'Address': 'address' },
         '👨‍👩‍👧 Nominee': { 'Nominee Name': 'nominee_name', 'Nominee Phone': 'nominee_phone' },
         '🏦 Bank': { 'Bank Name': 'bank_name', 'Branch': 'branch_name', 'Account No.': 'account_number', 'IFSC': 'ifsc_code', 'Branch Code': 'branch_code', 'UPI ID': 'upi_id' },
-        '💼 Job': { 'Emp Type': 'employee_type', 'Designation': 'designation', 'Salary/mo': 'salary', 'Joining Date': 'joining_date', 'Location': 'work_location' }
+        '💼 Job': { 'Emp Type': 'employee_type', 'Designation': 'designation', 'Salary/mo': 'salary', 'Joining Date': 'joining_date', 'Location': 'work_location' },
+        '📄 Documents': { 'CV/Resume': 'cv_resume', 'ID Proof': 'id_proof', 'Bank Passbook': 'bank_passbook', 'Marksheet': 'marksheet', 'Appointment Letter': 'appointment_letter' }
       };
 
       let html = '';
       for (const [section, fields] of Object.entries(sections)) {
         html += `<div class="section-title">${section}</div>`;
         for (const [label, key] of Object.entries(fields)) {
-          const val = emp[key] || 'N/A';
-          const displayVal = key === 'salary' && val !== 'N/A' ? `₹${parseInt(val).toLocaleString('en-IN')}/month` : val;
+          let val = emp[key] || 'N/A';
+          let displayVal = val;
+
+          if (key === 'salary' && val !== 'N/A' && val !== null) {
+            displayVal = `₹${parseInt(val).toLocaleString('en-IN')}/month`;
+          } else if (['cv_resume', 'id_proof', 'bank_passbook', 'marksheet', 'appointment_letter'].includes(key)) {
+             if (val && typeof val === 'string' && val.startsWith('/uploads/')) {
+                const docUrl = `http://127.0.0.1:3000${val}`;
+                displayVal = `<a href="${docUrl}" target="_blank" style="display: inline-block; background: #3f51b5; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 11px;">📄 View Document</a>`;
+             } else if (val && (typeof val === 'object' || (typeof val === 'string' && val.includes('[object File]')))) {
+                displayVal = `<span style="color: #666; font-style: italic;">Saved Locally (Restart server to sync)</span>`;
+             } else {
+                displayVal = 'N/A';
+             }
+          } else {
+             displayVal = val;
+          }
+
           html += `<div class="detail-item"><div class="dlabel">${label}</div><div class="dval">${displayVal}</div></div>`;
         }
       }
 
+      html += `<div style="grid-column: span 2; margin-top: 20px; text-align: center;">
+                <button onclick="exportProfilePDF('${empId}')" style="background:#3f51b5; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:bold; cursor:pointer;">📥 Export Full Profile (PDF)</button>
+               </div>`;
+
       document.getElementById('modalContent').innerHTML = html;
       document.getElementById('detailModal').classList.add('show');
+    }
+
+    async function exportProfilePDF(empId) {
+      const emp = allData.find(r => r.emp_id === empId);
+      if (!emp) return;
+
+      const { jsPDF } = window.jspdf;
+      if (!jsPDF) {
+          // Load jsPDF dynamically if not present
+          const script = document.createElement('script');
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+          document.head.appendChild(script);
+          script.onload = () => exportProfilePDF(empId);
+          return;
+      }
+      
+      const doc = new jsPDF();
+      doc.setFontSize(22);
+      doc.setTextColor(63, 81, 181);
+      doc.text("EMPLOYEE REGISTRATION PROFILE", 105, 20, { align: "center" });
+      
+      doc.setDrawColor(63, 81, 181);
+      doc.setLineWidth(1);
+      doc.line(20, 25, 190, 25);
+      
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont("helvetica", "bold");
+      
+      let y = 40;
+      const leftCol = 20;
+      const rightCol = 110;
+      
+      const addRow = (label, value) => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label}:`, leftCol, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${value || 'N/A'}`, leftCol + 40, y);
+        y += 10;
+      };
+
+      doc.setFontSize(14);
+      doc.text("Personal Information", leftCol, y);
+      y += 8;
+      doc.setFontSize(10);
+      addRow("Employee ID", emp.emp_id);
+      addRow("Full Name", emp.employee_name);
+      addRow("Email", emp.employee_email);
+      addRow("Phone", emp.phone_number);
+      addRow("Date of Birth", emp.dob);
+      addRow("Blood Group", emp.blood_group);
+      
+      y += 5;
+      doc.setFontSize(14);
+      doc.text("Employment Details", leftCol, y);
+      y += 8;
+      doc.setFontSize(10);
+      addRow("Designation", emp.designation);
+      addRow("Salary", `INR ${parseInt(emp.salary || 0).toLocaleString('en-IN')}/month`);
+      addRow("Joining Date", emp.joining_date);
+      addRow("Work Location", emp.work_location);
+      
+      y += 5;
+      doc.setFontSize(14);
+      doc.text("Bank Information", leftCol, y);
+      y += 8;
+      doc.setFontSize(10);
+      addRow("Bank Name", emp.bank_name);
+      addRow("Account No", emp.account_number);
+      addRow("IFSC Code", emp.ifsc_code);
+      
+      doc.save(`Profile_${emp.emp_id.replace(/\//g, '_')}.pdf`);
     }
 
     function closeModal(e) {
@@ -264,16 +422,37 @@
 
     async function deleteEmployee(empId) {
       if (!confirm(`Delete employee ${empId}? This cannot be undone.`)) return;
+      
+      let backendSuccess = false;
       try {
-        const resp = await fetch(`http://localhost:3000/api/employees/${encodeURIComponent(empId)}`, { method: 'DELETE' });
-        if (resp.ok) {
-          allData = allData.filter(r => r.emp_id !== empId);
-          renderTable();
-        } else {
-          alert('Delete failed. Please try again.');
-        }
+        const resp = await fetch(`http://127.0.0.1:3000/api/employees/${encodeURIComponent(empId)}`, { method: 'DELETE' });
+        if (resp.ok) backendSuccess = true;
       } catch (e) {
-        alert('Network error: ' + e.message);
+        console.warn('Backend delete failed/offline:', e.message);
+      }
+
+      // Also try deleting from local storage
+      try {
+        const lsStr = localStorage.getItem('mevtencia_employeeDatabase');
+        if (lsStr) {
+          const db = JSON.parse(lsStr);
+          // Find the key the employee is stored under (usually their empId)
+          for (let key in db) {
+             if (db[key].id === empId || db[key].employeeId === empId) {
+                 delete db[key];
+                 break;
+             }
+          }
+          localStorage.setItem('mevtencia_employeeDatabase', JSON.stringify(db));
+        }
+      } catch(e) {}
+
+      // Regardless of backend, remove from UI array and re-render
+      allData = allData.filter(r => r.emp_id !== empId);
+      renderTable();
+      
+      if (!backendSuccess) {
+         console.log('Employee removed from local view/storage.');
       }
     }
 
