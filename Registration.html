@@ -226,8 +226,10 @@
 <body>
     <div class="container">
         <div class="header">
+            <div style="margin-bottom: 15px;">
+                <img src="assets/logo.png" alt="Mevrick Solution" style="width: 100px; height: 100px; object-fit: contain; background: white; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid #667eea; padding: 8px;">
+            </div>
             <div class="company-logo">MEVRICK SOLUTION PRIVATE LIMITED</div>
-            <!-- <div class="company-tagline">Private Limited</div> -->
         </div>
 
         <h1>Employee Online Registration Form</h1>
@@ -462,11 +464,19 @@
             const applyTemplate = async (docObj) => {
                 try {
                     const response = await fetch('assets/letterhead.png');
+                    if (!response.ok) {
+                        console.warn("Letterhead image not found, generating without template.");
+                        return;
+                    }
                     const blob = await response.blob();
                     return new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onloadend = () => {
-                            docObj.addImage(reader.result, 'PNG', 0, 0, pageWidth, pageHeight);
+                            try {
+                                docObj.addImage(reader.result, 'PNG', 0, 0, pageWidth, pageHeight);
+                            } catch (e) {
+                                console.error("Error adding image to PDF:", e);
+                            }
                             resolve();
                         };
                         reader.readAsDataURL(blob);
@@ -616,12 +626,16 @@
 
             const employeeId = `MEV/${Math.floor(Math.random() * 999) + 100}/2025`;
 
+            console.log("Submitting form with data:", Object.fromEntries(new FormData(document.getElementById('registrationForm'))));
+
             try {
                 // 1. Generate Appointment Letter PDF
+                console.log("Starting PDF generation...");
                 const doc = await generateAppointmentLetter({
                     ...Object.fromEntries(new FormData(document.getElementById('registrationForm'))),
                     employeeId: employeeId
                 });
+                console.log("PDF generated successfully:", doc);
                 const appointmentBlob = doc.output('blob');
 
                 // 2. Prepare FormData for Multiparts Upload

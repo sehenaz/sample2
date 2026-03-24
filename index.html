@@ -270,18 +270,18 @@
 <body>
 
   <nav class="navbar">
-    <div class="logo">MEVTENCIA</div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="assets/logo.png" alt="Mevrick Logo" style="height: 60px; width: 60px; object-fit: contain; background: white; border-radius: 50%; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      <div class="logo">MEVTENCIA</div>
+    </div>
     <div class="nav-time" id="liveTime">--:--</div>
   </nav>
 
   <div class="container">
 
     <div class="hero-card">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M10 2h4a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h3V4a2 2 0 0 1 2-2zm4 6V4h-4v4h4z" />
-        </svg>
+      <div style="margin-bottom: 20px;">
+        <img src="assets/logo.png" alt="Mevrick Solution" style="width: 120px; height: 120px; object-fit: contain; background: white; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid #3f51b5; padding: 10px;">
       </div>
       <h1>MEVTENCIA</h1>
       <p>Mevrick Solution Pvt. Ltd. — Pan India Attendance System</p>
@@ -372,9 +372,9 @@
       deferredPrompt = null; banner.classList.remove('show');
     });
     window.addEventListener('appinstalled', () => banner.classList.remove('show'));
-    if ('serviceWorker' in navigator) navigato
-
-    r.serviceWorker.register('./sw.js').catch(() => { });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => { });
+    }
   </script>
 </body>
 
