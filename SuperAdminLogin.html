@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#673ab7" />
+  <title>MEVTENCIA — Super Admin Login</title>
+  <link rel="icon" href="assets/logo.png" type="image/x-icon">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      color: #111827;
+      font-size: 18px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #673ab7;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 12px;
+      transition: background 0.12s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(103, 58, 183, 0.08);
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    .login-wrapper {
+      text-align: center;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .header-section {
+      margin-bottom: 30px;
+    }
+
+    .super-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #673ab7, #512da8);
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 26px rgba(103, 58, 183, 0.3);
+    }
+
+    .super-icon svg {
+      width: 35px;
+      height: 35px;
+      fill: white;
+    }
+
+    .title {
+      font-size: 28px;
+      color: rgba(255, 255, 255, 0.98);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: #aaa;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 14px 14px 44px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: all 0.2s;
+      outline: none;
+      min-height: 50px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .form-control:focus {
+      border-color: #673ab7;
+      box-shadow: 0 0 0 3px rgba(103, 58, 183, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #673ab7 0%, #512da8 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 50px;
+    }
+
+    .login-btn:hover {
+      box-shadow: 0 10px 25px rgba(103, 58, 183, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .login-btn:active {
+      transform: scale(0.99);
+    }
+
+    .msg {
+      margin-top: 14px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .msg.show {
+      display: block;
+      animation: pop 0.18s ease-out;
+    }
+
+    @keyframes pop {
+      from {
+        transform: translateY(-6px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .msg.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .msg.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="assets/logo.png" alt="Mevrick Logo"
+        style="height: 60px; width: 60px; object-fit: contain; background: white; border-radius: 50%; padding: 6px;">
+      <a class="logo" href="index.html">MEVTENCIA</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">← Home</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="login-wrapper">
+      <div class="header-section">
+        <div style="margin-bottom: 20px;">
+          <img src="assets/logo.png" alt="Mevrick Logo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: contain; background: white; padding: 10px; box-shadow: 0 8px 25px rgba(103, 58, 183, 0.3);">
+        </div>
+        <h1 class="title">Super Admin</h1>
+        <p class="subtitle">Management Access Control</p>
+      </div>
+
+      <div class="login-card">
+        <div class="form-group">
+          <label>Super Admin ID</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+            <input type="text" class="form-control" id="superId" placeholder="Enter Super Admin ID"
+              autocomplete="off" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+            </svg>
+            <input type="password" class="form-control" id="password" placeholder="••••••••"
+              autocomplete="current-password" />
+          </div>
+        </div>
+
+        <button class="login-btn" onclick="doSuperLogin()">🛡️ Super Access</button>
+        <div class="msg error" id="msgErr"></div>
+        <div class="msg success" id="msgOk"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2026 MEVTENCIA · Super Admin Panel</footer>
+
+  <script>
+    const SUPER_ADMINS = [
+      { id: 'admin@super', name: 'Somoresh Sir', password: 'super@20261', phone: '9876543210' },
+      { id: 'admin@super', name: 'Akash Singh sir', password: 'super@20262', phone: '8765432109' },
+      { id: 'admin@super', name: 'Somnath sir', password: 'super@20263', phone: '7654321098' }
+    ];
+
+    function showMsg(id, msg) {
+      const el = document.getElementById(id); el.textContent = msg; el.classList.add('show');
+    }
+    function hideMsg(id) { const el = document.getElementById(id); el.classList.remove('show'); el.textContent = ''; }
+
+    function doSuperLogin() {
+      hideMsg('msgErr'); hideMsg('msgOk');
+      const id = document.getElementById('superId').value.trim();
+      const pw = document.getElementById('password').value;
+
+      const admin = SUPER_ADMINS.find(a => a.id === id && a.password === pw);
+
+      if (!id || !pw) { showMsg('msgErr', '⚠️ Please fill in all fields.'); return; }
+      if (!admin) { showMsg('msgErr', '❌ Invalid Super Admin ID or Password.'); return; }
+
+      localStorage.setItem('mev_superSession', JSON.stringify({ type: 'super', id: admin.id, name: admin.name, loginAt: new Date().toISOString() }));
+      showMsg('msgOk', '✅ Access Granted! Redirecting...');
+      setTimeout(() => window.location.href = 'SuperAdminDashboard.html', 800);
+    }
+
+    document.addEventListener('keypress', e => { if (e.key === 'Enter') doSuperLogin(); });
+  </script>
+</body>
+
+</html>
