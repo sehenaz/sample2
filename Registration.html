@@ -9,6 +9,41 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
+        .navbar {
+            background-color: #1a408d;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin: -20px -20px 20px -20px;
+        }
+
+        .navbar .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 15px;
+            opacity: 0.9;
+        }
+
+        .navbar .nav-links a:hover {
+            opacity: 1;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,8 +51,8 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             padding: 20px;
             min-height: 100vh;
         }
@@ -37,7 +72,7 @@
         }
 
         .company-logo {
-            color: #667eea;
+            color: #1a408d;
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 5px;
@@ -50,21 +85,19 @@
         }
 
         h1 {
-            color: #667eea;
+            color: #1a408d;
             text-align: center;
             margin-bottom: 10px;
             font-size: 28px;
             margin-top: 20px;
-
-
         }
 
         h2 {
-            color: #764ba2;
+            color: #1a408d;
             margin-top: 30px;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid #1a408d;
             font-size: 20px;
         }
 
@@ -131,7 +164,7 @@
         button {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a408d 0%, #0d2552 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -139,7 +172,7 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
         }
 
         button:hover {
@@ -184,7 +217,7 @@
             display: none;
             text-align: center;
             padding: 20px;
-            color: #667eea;
+            color: #1a408d;
             font-weight: bold;
         }
 
@@ -223,11 +256,22 @@
     </style>
 </head>
 
-<body>
+<body style="padding-top: 0;">
+    <nav class="navbar">
+        <a href="index.html" class="logo-area">
+            <img src="assets/logo.png" alt="Mevrick" style="height: 48px; width: auto; object-fit: contain;">
+            <span>MEVTENCIA</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="EmployeeHistory.html">History</a>
+        </div>
+    </nav>
     <div class="container">
         <div class="header">
             <div style="margin-bottom: 15px;">
-                <img src="assets/logo.png" alt="Mevrick Solution" style="width: 100px; height: 100px; object-fit: contain; background: white; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid #667eea; padding: 10px;">
+                <img src="assets/logo.png" alt="Mevrick Solution"
+                    style="width: auto; height: 80px; object-fit: contain;">
             </div>
             <div class="company-logo">MEVRICK SOLUTION PRIVATE LIMITED</div>
         </div>
@@ -421,25 +465,25 @@
             <h2>📎 Document Upload</h2>
 
             <div class="form-group">
-                <label class="required">CV / Resume</label>
-                <input type="file" id="cvResume" name="cvResume" accept=".pdf,.doc,.docx" required>
-                <div class="note">Accepted formats: PDF, DOC, DOCX (Max 5MB)</div>
+                <label class="required">CV / Resume (Converts to PDF)</label>
+                <input type="file" id="cvResume" name="cvResume" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+                <div class="note">Accepted formats: PDF, JPG, PNG, DOC (Max 5MB)</div>
             </div>
 
             <div class="form-group">
-                <label class="required">Aadhaar Card / PAN Card</label>
+                <label class="required">Aadhaar Card / PAN Card (Converts to PDF)</label>
                 <input type="file" id="idProof" name="idProof" accept=".pdf,.jpg,.jpeg,.png" required>
                 <div class="note">Accepted formats: PDF, JPG, PNG (Max 5MB)</div>
             </div>
 
             <div class="form-group">
-                <label class="required">Bank Passbook (Front Page)</label>
+                <label class="required">Bank Passbook (Front Page - Converts to PDF)</label>
                 <input type="file" id="bankPassbook" name="bankPassbook" accept=".pdf,.jpg,.jpeg,.png" required>
                 <div class="note">Accepted formats: PDF, JPG, PNG (Max 5MB)</div>
             </div>
 
             <div class="form-group">
-                <label class="required">Last Exam Marksheet / Certificate</label>
+                <label class="required">Last Exam Marksheet / Certificate (Converts to PDF)</label>
                 <input type="file" id="marksheet" name="marksheet" accept=".pdf,.jpg,.jpeg,.png" required>
                 <div class="note">Accepted formats: PDF, JPG, PNG (Max 5MB)</div>
             </div>
@@ -449,163 +493,315 @@
     </div>
 
     <script>
-        // Generate Custom Appointment Letter - Matching Exact PDF Format
+        // ─────────────────────────────────────────────────────────────────────────
+        // Generate Appointment Letter — matches Sehenaz Khatun PDF exactly
+        // ─────────────────────────────────────────────────────────────────────────
         async function generateAppointmentLetter(formData) {
+            // Load logo dynamically
+            const logoBase64 = await new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => resolve(null);
+                img.src = 'assets/logo.png';
+            });
+
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
-            const pageWidth = doc.internal.pageSize.width;
-            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.getWidth();   // 210
+            const pageHeight = doc.internal.pageSize.getHeight();  // 297
+            const mL = 18;   // left margin
+            const mR = 18;   // right margin
+            const cW = pageWidth - mL - mR;  // content width
 
-            // Adjusted margins to fit inside the white "paper" portion of the background image
-            const marginLeft = 38;
-            const marginRight = 38;
-            const contentWidth = pageWidth - marginLeft - marginRight;
-            const applyTemplate = async (docObj) => {
-                try {
-                    const response = await fetch('assets/letterhead.png');
-                    if (!response.ok) {
-                        console.warn("Letterhead image not found, generating without template.");
-                        return;
-                    }
-                    const blob = await response.blob();
-                    return new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            try {
-                                docObj.addImage(reader.result, 'PNG', 0, 0, pageWidth, pageHeight);
-                            } catch (e) {
-                                console.error("Error adding image to PDF:", e);
-                            }
-                            resolve();
-                        };
-                        reader.readAsDataURL(blob);
-                    });
-                } catch (err) {
-                    console.error("Failed to load letterhead image:", err);
+            // ── Ordinal helper ──────────────────────────────────────────────────
+            const ordinal = n =>
+                n + (n > 10 && n < 20 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'));
+
+            // ── Date / salary helpers ───────────────────────────────────────────
+            const employeeId = formData.employeeId || `MEV/${Math.floor(Math.random() * 899) + 100}/2025`;
+            const today = new Date();
+            const currentDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+            const jDate = formData.joiningDate ? new Date(formData.joiningDate) : today;
+            const jDateStr = `${ordinal(jDate.getDate())} ${jDate.toLocaleDateString('en-GB', { month: 'long' })} ${jDate.getFullYear()}`;
+            const monthlySalary = parseFloat(formData.salary) || 12000;
+            const annualSalary = monthlySalary * 12;
+            const fmtMoney = v => v.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const posTitle = (formData.designation || 'Software Developer');
+            const empType = formData.employeeType || 'Full Time';
+            const empTypeLabel = empType === 'Full Time' ? 'Full time' : 'Casual/Contractual';
+            const location = formData.workLocation || 'Kalyani (HO)';
+            const empName = formData.employeeName || 'Employee';
+
+            // ── PAGE TEMPLATE (header + watermark + contact) ──────────────────
+            const drawTemplate = (d) => {
+                const pW = d.internal.pageSize.getWidth();
+                const pH = d.internal.pageSize.getHeight();
+
+                // ── WATERMARK ──
+                d.saveGraphicsState();
+                const gState = new d.GState({ opacity: 0.04 });
+                d.setGState(gState);
+                d.setFontSize(40);
+                d.setFont('times', 'bold');
+                d.setTextColor(150, 150, 150);
+                d.text("MEVRICK SOLUTIONS PRIVATE LIMITED", pW / 2, pH / 2, {
+                    align: 'center',
+                    angle: 45
+                });
+                d.restoreGraphicsState();
+
+                // ── HEADER DESIGN (Navy & Light Blue Swoosh) ──
+                // Light Blue Background Wave
+                d.setFillColor(150, 180, 220); // Light blue
+                d.ellipse(pW / 2, -10, pW * 2, 70, 'F'); 
+
+                // Dark Blue Main Wave
+                d.setFillColor(34, 53, 118); // Navy blue
+                d.ellipse(pW / 2 - 20, -20, pW * 2, 70, 'F');
+                
+                // Logo Circle Container
+                d.setFillColor(255, 255, 255);
+                d.circle(45, 30, 20, 'F');
+                
+                // Inner Border for Logo
+                d.setDrawColor(26, 64, 141);
+                d.setLineWidth(0.5);
+                d.circle(45, 30, 18, 'D');
+
+                if (logoBase64) {
+                    d.addImage(logoBase64, 'PNG', 30, 20, 30, 14);
+                } else {
+                    d.setFillColor(26, 64, 141);
+                    d.circle(45, 30, 12, 'F');
+                    d.setTextColor(255, 255, 255);
+                    d.setFontSize(10);
+                    d.setFont('times', 'bold');
+                    d.text('MS', 45, 30, { align: 'center', baseline: 'middle' });
+                }
+
+                // Contact info
+                d.setTextColor(0, 0, 0);
+                d.setFontSize(9);
+                d.setFont('times', 'bold');
+                const contactRX = pW - 18;
+                d.text('Webel IT Park, Phase - 2, Kalyani, WB - 741235', contactRX, 20, { align: 'right' });
+                d.text('033-46019562 / +91-8450841207', contactRX, 24, { align: 'right' });
+                d.text('info@mevrick.in', contactRX, 28, { align: 'right' });
+                d.text('www.mevrick.in', contactRX, 32, { align: 'right' });
+
+                // Icons (Simulated as little cyan circles)
+                d.setFillColor(0, 170, 255);
+                d.setDrawColor(255, 255, 255);
+                [19, 23, 27, 31].forEach(cy => {
+                    d.circle(contactRX + 4, cy, 1.5, 'FD');
+                });
+
+                d.setTextColor(0, 0, 0);
+            };
+
+            const lineH = 5.2;
+            const secGap = 5;
+            const bodyTop = 75;
+            const bodyBot = pageHeight - 14;
+
+            const ensureSpace = (d, needed) => {
+                if (y + needed > bodyBot) {
+                    d.addPage();
+                    drawTemplate(d);
+                    y = bodyTop + 10;
                 }
             };
-            const employeeId = formData.employeeId || `MEV/${Math.floor(Math.random() * 999) + 100}/2024`;
-            const currentDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-            await applyTemplate(doc);
-            doc.setTextColor(20, 20, 20);
-            let yPosition = 75; // Lower Y position to account for the grey padding + header in the image
+            const printText = (d, text, x, w, size, bold, indent) => {
+                d.setFontSize(size);
+                d.setFont('times', bold ? 'bold' : 'normal');
+                const lines = d.splitTextToSize(text, w);
+                lines.forEach(line => {
+                    ensureSpace(d, lineH);
+                    d.text(line, x + (indent || 0), y);
+                    y += lineH;
+                });
+            };
 
-            // Header Section
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'bold');
-            doc.text(`REF.NO. - ${employeeId}`, marginLeft, yPosition);
-            doc.text(`Date: ${currentDate}`, pageWidth - marginRight, yPosition, { align: 'right' });
-            yPosition += 8;
+            const printBullet = (d, text, size) => {
+                const bIndent = 8;
+                const bW = cW - bIndent - 8;
+                d.setFontSize(size);
+                d.setFont('times', 'normal');
+                const lines = d.splitTextToSize(text, bW);
+                lines.forEach((line, i) => {
+                    ensureSpace(d, lineH);
+                    if (i === 0) d.text('\u2022', mL + bIndent - 4, y);
+                    d.text(line, mL + bIndent, y);
+                    y += lineH;
+                });
+                y += 1;
+            };
 
-            const positionTitle = (formData.designation || "Web Developer").toUpperCase();
-            doc.setFont(undefined, 'bold');
-            doc.text(`Subject:`, marginLeft, yPosition);
-            doc.setFont(undefined, 'italic');
-            doc.text(` Appointment for the Post of ${positionTitle}`, marginLeft + 14, yPosition);
-            yPosition += 8;
+            const printSubBullet = (d, text, size) => {
+                const bIndent = 14;
+                const bW = cW - bIndent - 4;
+                d.setFontSize(size);
+                d.setFont('times', 'normal');
+                const lines = d.splitTextToSize(text, bW);
+                lines.forEach((line, i) => {
+                    ensureSpace(d, lineH);
+                    if (i === 0) d.text('o', mL + bIndent - 3, y);
+                    d.text(line, mL + bIndent, y);
+                    y += lineH;
+                });
+                y += 1;
+            };
 
-            doc.setFont(undefined, 'normal');
-            doc.text(`Dear ${formData.employeeName},`, marginLeft, yPosition);
-            yPosition += 8;
+            const sectionHeader = (d, text, size) => {
+                ensureSpace(d, lineH + 4);
+                d.setFontSize(size);
+                d.setFont('times', 'bold');
+                d.text(text, mL, y);
+                y += lineH + 1;
+            };
 
-            const monthlySalary = parseInt(formData.salary) || 15000;
-            const annualCTC = (monthlySalary * 12).toLocaleString('en-IN');
+            drawTemplate(doc);
+            y = bodyTop;
 
-            const jDate = formData.joiningDate ? new Date(formData.joiningDate) : new Date();
-            const ordinal = (n) => n + (n > 10 && n < 20 ? 'th' : { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
-            const jDateStr = `${ordinal(jDate.getDate())} ${jDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`;
+            doc.setFontSize(11);
+            doc.setFont('times', 'bold');
+            doc.text(`Employee ID: ${employeeId}`, mL, y);
+            doc.text(`Date: ${currentDate}`, pageWidth - mR, y, { align: 'right' });
+            y += lineH + 6;
 
-            const expiryDate = new Date(jDate.getTime() + (7 * 24 * 60 * 60 * 1000));
-            const expiryStr = `${expiryDate.toLocaleDateString('en-GB', { month: 'long' })} ${ordinal(expiryDate.getDate())}, ${expiryDate.getFullYear()}`;
+            doc.setFontSize(12);
+            doc.setFont('times', 'bold');
+            const subjectText = `Subject: Appointment Letter for the Position of ${posTitle}`;
+            doc.text(subjectText, mL, y);
+            const subW = doc.getTextWidth(subjectText);
+            doc.setLineWidth(0.4);
+            doc.line(mL, y + 1.2, mL + subW, y + 1.2);
+            y += lineH + 8;
 
-            const paragraphs = [
-                `We are delighted to extend an offer to you to join MEVRICK SOLUTION PVT. LTD. in the capacity of ${positionTitle}, effective from your anticipated start date of ${jDateStr}.`,
-                `Your current annual Gross CTC will be INR ${annualCTC}. Please note that the structure of your compensation plan may be subject to adjustments in accordance with our Compensation policy and practices.`,
-                `You will be subject to Six months probation period. During this time, the notice period for resignation will be 15 days on either side. Upon successful completion of the probation period, the notice period for resignation will be 30 days/01 month on either side.`,
-                `Your primary place of work will be at the address mentioned above. However, you may be required to relocate to any of our offices in India or abroad as per business requirements.`,
-                `As an employee of MEVRICK SOLUTION PVT. LTD., you may have access to confidential and proprietary information pertaining to our operations, products, and services, as well as those of our clients. To safeguard the interests of all parties involved, you will be required to review and sign an Employment Agreement prior to your commencement of employment.`,
-                `You are expected to adhere to the rules and regulations of the Company, and any violation thereof may result in disciplinary action.`,
-                `Your appointment is contingent upon satisfactory reference checks and clearance from any existing secrecy or service agreements.`,
-                `Please note that this offer is based on the information provided in your application and interviews. Any discrepancy found in this information may result in the termination of your employment without notice. This letter is valid until ${expiryStr} and failure to confirm acceptance by this date may result in the withdrawal of the offer.`,
-                `Your daily tasks and targets will be provided by your Supervisor.`,
-                `We eagerly anticipate your contributions to the growth of our organization and your professional development. Upon joining, please bring the following documents for verification/submission:`,
-                `- Original and copies of educational certificates and mark sheets.`,
-                `- Relieving letter & experience certificate from previous employer[s].`,
-                `- Salary certificate from previous employer.`,
-                `- Original & copy of your passport.`,
-                `- Three passport size photographs.`
-            ];
+            doc.setFontSize(12);
+            doc.setFont('times', 'normal');
+            doc.text('Dear ', mL, y);
+            const dearW = doc.getTextWidth('Dear ');
+            doc.setFont('times', 'bold');
+            doc.text(`${empName},`, mL + dearW, y);
+            y += lineH + 3;
 
+            printText(doc, `We are pleased to appoint you the position of ${posTitle} with Mevrick Solutions Private Limited on a ${empTypeLabel} basis under the terms and conditions set forth in this letter.`, mL, cW, 10.5, false);
+            y += secGap;
+
+            sectionHeader(doc, '1. Joining Date & Reporting', 10);
+            printText(doc, `Your joining date, as per our records, will be ${jDateStr}. You will report to your designated Manager.`, mL + 5, cW - 8, 9.5, false);
+            printBullet(doc, `Your initial posting will be at ${location}, however, you may be transferred to any of our offices in India or abroad based on business requirements.`, 9.5);
+            y += secGap;
+
+            sectionHeader(doc, '2. Compensation', 10);
+            printText(doc, `Your current annual Gross CTC will be INR ${fmtMoney(annualSalary)} as decided. However, the structure of your compensation plan may be Revised from time to time in accordance with the company's policies, industry practices and market standards.`, mL, cW, 9.5, false);
+            y += secGap;
+
+            sectionHeader(doc, '3. Confidentiality & Code of Conduct', 10);
+            printText(doc, 'As a member of our team, you may have access to confidential and proprietary information related to our company, its clients, and partners. You are required to:', mL, cW, 9.5, false);
+            printBullet(doc, 'Maintain strict confidentiality of all business information.', 9.5);
+            printBullet(doc, 'Adhere to company rules, policies, and procedures, which may be revised from time to time.', 9.5);
+            printBullet(doc, 'Avoid any activity that may be deemed as a conflict of interest.', 9.5);
+            y += secGap;
+
+            sectionHeader(doc, '4. Work & Performance', 10);
+            printBullet(doc, 'Develop clean, efficient code and follow company coding standards.', 9.5);
+            printBullet(doc, 'Complete tasks assigned by your Manager/Team Lead within deadlines.', 9.5);
+            printBullet(doc, 'Participate in development, testing, and troubleshooting as required.', 9.5);
+            printBullet(doc, 'Performance will be reviewed regularly; failure to meet expectations may lead to corrective actions or termination.', 9.5);
+            y += secGap;
+
+            sectionHeader(doc, '5. Terms of Contract & Termination', 10);
+            printBullet(doc, `This appointment is ${empType === 'Full Time' ? 'full-time' : 'casual/contractual'} in nature.`, 9.5);
+            printBullet(doc, "As per company policy, your probation period will be 6 months. During this period, either party may terminate the employment with 1 week's notice.", 9.5);
+            printBullet(doc, 'After the probation period, the notice period for resignation will be 30 days (1 month) on either side.', 9.5);
+            printBullet(doc, 'The company reserves the right to terminate your employment immediately in case of gross misconduct, violation of rules, or non-performance.', 9.5);
+            y += secGap;
+
+            sectionHeader(doc, '6. Company Property & Assets', 10);
+            printBullet(doc, 'You are not permitted to remove, misuse, or take away any company assets without prior written authorization.', 9.5);
+            y += secGap;
+
+            sectionHeader(doc, '7. Non-Payment Policy', 10);
+            printText(doc, 'Employees confirm that they have not made any payments to Mevrick Solutions Pvt. Ltd. in relation to their employment. Any attempt to offer or accept money, gifts, or favors will be treated as fraudulent activity.', mL, cW, 9.5, false);
+            y += secGap;
+
+            ensureSpace(doc, 70);
+            const tX = mL;
+            const tW = cW - 6;
+            const c1W = tW * 0.52;
+            const c2W = tW * 0.24;
+            const c3W = tW * 0.24;
+            const rH = 7;
+
+            doc.setFillColor(230, 230, 230);
+            doc.rect(tX, y, tW, rH, 'FD');
             doc.setFontSize(8.5);
-            const lineSpacing = 4.2;
-
-            // RENDERING SINGLE PAGE TEXT
-            for (let i = 0; i < paragraphs.length; i++) {
-                const text = paragraphs[i];
-                const lines = doc.splitTextToSize(text, contentWidth);
-
-                for (let j = 0; j < lines.length; j++) {
-                    const line = lines[j];
-                    let xOff = marginLeft;
-
-                    if (i === 0) { // First Paragraph Highlights
-                        let words = line.split(' ');
-                        for (let word of words) {
-                            const isDesig = word.toLowerCase().includes(positionTitle.toLowerCase().split(' ')[0]);
-                            const isDate = word.includes(jDateStr.split(' ')[1]) || word.match(/\d+st|\d+nd|\d+rd|\d+th/);
-
-                            if (isDesig) doc.setFont('helvetica', 'bolditalic');
-                            else if (isDate) doc.setFont('helvetica', 'italic');
-                            else doc.setFont('helvetica', 'normal');
-
-                            doc.text(word + ' ', xOff, yPosition);
-                            xOff += doc.getTextWidth(word + ' ');
-                        }
-                    } else if (i === 7) { // Offer Validity Date
-                        let words = line.split(' ');
-                        for (let word of words) {
-                            if (word.includes(expiryStr.split(' ')[0]) || word.match(/\d+st|\d+nd|\d+rd|\d+th/)) {
-                                doc.setFont('helvetica', 'italic');
-                            } else {
-                                doc.setFont('helvetica', 'normal');
-                            }
-                            doc.text(word + ' ', xOff, yPosition);
-                            xOff += doc.getTextWidth(word + ' ');
-                        }
-                    } else {
-                        doc.setFont('helvetica', 'normal');
-                        doc.text(line, marginLeft, yPosition, { align: 'justify' });
-                    }
-                    yPosition += lineSpacing;
-                }
-                yPosition += 2.2;
-            }
-
-            // Signature Section
-            yPosition = Math.max(yPosition, pageHeight - 85);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Sincerely,', marginLeft, yPosition);
-            yPosition += 6;
             doc.setFont('helvetica', 'bold');
-            doc.text('For MEVRICK SOLUTION PVT LTD', marginLeft, yPosition);
-
-            // Stamp
-            const stompX = marginLeft + 2;
-            doc.setTextColor(110, 110, 190);
-            doc.setFontSize(7.5);
-            doc.text('MEVRICK SOLUTION PVT. LTD.', stompX, yPosition + 4.5);
-            doc.setDrawColor(110, 110, 190);
+            doc.setDrawColor(150, 150, 150);
             doc.setLineWidth(0.3);
-            doc.line(stompX + 5, yPosition + 11, stompX + 22, yPosition + 11);
-            doc.text('DIRECTOR', stompX + 7, yPosition + 16);
+            doc.text(`Compensation Break up with effective from ${jDateStr}`, tX + 2, y + 5);
+            y += rH;
 
-            doc.setTextColor(0, 0, 0);
+            doc.setFillColor(245, 245, 245);
+            doc.rect(tX, y, tW, rH, 'FD');
+            doc.text(empName, tX + 2, y + 5);
+            y += rH;
+
+            doc.setFillColor(255, 255, 255);
+            doc.rect(tX, y, c1W, rH, 'D');
+            doc.rect(tX + c1W, y, c2W, rH, 'D');
+            doc.rect(tX + c1W + c2W, y, c3W, rH, 'D');
+            doc.text('Monthly', tX + c1W + 2, y + 5);
+            doc.text('Annual', tX + c1W + c2W + 2, y + 5);
+            y += rH;
+
+            doc.rect(tX, y, c1W, rH, 'D');
+            doc.rect(tX + c1W, y, c2W, rH, 'D');
+            doc.rect(tX + c1W + c2W, y, c3W, rH, 'D');
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8.5);
-            doc.text('Authorized Signatory', marginLeft, pageHeight - 40);
-            doc.text('Acceptance Signature', pageWidth - marginRight, pageHeight - 40, { align: 'right' });
+            doc.text('Gross Salary', tX + 2, y + 5);
+            doc.text(fmtMoney(monthlySalary), tX + c1W + 2, y + 5);
+            doc.text(fmtMoney(annualSalary), tX + c1W + c2W + 2, y + 5);
+            y += rH + secGap + 2;
+
+            doc.setFontSize(11);
+            doc.setFont('times', 'normal');
+            doc.text('We look forward to your valuable contribution.', mL, y);
+            y += secGap;
+
+            sectionHeader(doc, '9. Acknowledgement & Acceptance', 11);
+            printText(doc, `I, ${empName}, accept the appointment as ${posTitle} at Mevrick Solutions Pvt. Ltd. and agree to abide by the terms and conditions stated above.`, mL, cW, 11, false);
+            y += 18;
+
+            doc.setFontSize(11);
+            doc.setFont('times', 'normal');
+            doc.text('Sincerely,', mL, y);
+            y += lineH + 4;
+
+            doc.setFont('times', 'bold');
+            doc.text('For MEVRICK SOLUTION PVT LTD', mL, y);
+            y += 18;
+            doc.text('Authorized Signatory', mL, y);
+
+            const sigLineEnd = pageWidth - mR;
+            const sigLineStart = sigLineEnd - 55;
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.3);
+            doc.line(sigLineStart, y, sigLineEnd, y);
+            doc.setFontSize(9);
+            doc.setFont('times', 'normal');
+            doc.text('Employee Signature', sigLineStart + 5, y + 4);
 
             return doc;
         }
@@ -649,45 +845,94 @@
                 }
                 fd.append('employeeId', employeeId);
 
-                // Add files from form
-                const cvFile = document.getElementById('cvResume').files[0];
-                const idFile = document.getElementById('idProof').files[0];
-                const bankFile = document.getElementById('bankPassbook').files[0];
-                const marksheetFile = document.getElementById('marksheet').files[0];
+                // Helper to PDF images/docs
+                const ensurePdf = async (file) => {
+                    if (!file) return null;
+                    if (file.type === 'application/pdf') return file;
 
-                if (cvFile) fd.append('cvResume', cvFile);
-                if (idFile) fd.append('idProof', idFile);
-                if (bankFile) fd.append('bankPassbook', bankFile);
-                if (marksheetFile) fd.append('marksheet', marksheetFile);
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const { jsPDF } = window.jspdf;
+                                const doc = new jsPDF();
+                                const imgWidth = doc.internal.pageSize.getWidth();
+                                const imgHeight = (img.height * imgWidth) / img.width;
+                                doc.addImage(e.target.result, 'JPEG', 0, 0, imgWidth, imgHeight);
+                                resolve(doc.output('blob'));
+                            };
+                            img.onerror = () => resolve(file); // Fallback to original if not an image
+                            img.src = e.target.result;
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                };
+
+                // Add files from form (converted to PDF)
+                const cvRaw = document.getElementById('cvResume').files[0];
+                const idRaw = document.getElementById('idProof').files[0];
+                const bankRaw = document.getElementById('bankPassbook').files[0];
+                const marksheetRaw = document.getElementById('marksheet').files[0];
+
+                console.log("Processing and converting documents to PDF...");
+                const cvFile = await ensurePdf(cvRaw);
+                const idFile = await ensurePdf(idRaw);
+                const bankFile = await ensurePdf(bankRaw);
+                const marksheetFile = await ensurePdf(marksheetRaw);
+
+                if (cvFile) fd.append('cvResume', cvFile, cvFile.name || 'cv.pdf');
+                if (idFile) fd.append('idProof', idFile, idFile.name || 'id_proof.pdf');
+                if (bankFile) fd.append('bankPassbook', bankFile, bankFile.name || 'bank_passbook.pdf');
+                if (marksheetFile) fd.append('marksheet', marksheetFile, marksheetFile.name || 'marksheet.pdf');
 
                 // Add generated PDF
                 fd.append('appointmentLetter', appointmentBlob, `Appointment_Letter_${employeeId.replace(/\//g, '_')}.pdf`);
 
-                const formData = Object.fromEntries(fd.entries());
+                const formData = {}; // Placeholder for legacy local data mapping
+                for (let pair of fd.entries()) {
+                    if (typeof pair[1] === 'string') formData[pair[0]] = pair[1];
+                }
 
                 // ALWAYS download the PDF for the user immediately
                 doc.save(`Appointment_Letter_${employeeId.replace(/\//g, '_')}.pdf`);
 
                 // 3. Attempt Server Save
+                let serverData = null;
                 try {
                     const response = await fetch('http://127.0.0.1:3000/api/register', {
                         method: 'POST',
                         body: fd
                     });
 
-                    if (!response.ok) {
+                    if (response.ok) {
                         const result = await response.json();
-                        throw new Error(result.error || 'Server save failed');
+                        serverData = result.employee; // Actual record with file paths
+                    } else {
+                        const result = await response.json();
+                        console.warn("Server save error:", result.error || 'Unknown error');
                     }
                 } catch (fetchError) {
                     console.warn("Backend save failed, continuing with local persistence:", fetchError);
-                    // We don't throw here so the user still gets local success feedback
                 }
 
                 // 4. Local Persistence (LocalStorage & Excel)
                 const LS_DB = "mevtencia_employeeDatabase";
                 let employeeDatabase = JSON.parse(localStorage.getItem(LS_DB) || "{}");
-                employeeDatabase[employeeId] = { id: employeeId, ...formData };
+
+                // If we got data back from the server (with file paths), use it!
+                // Otherwise fallback to form-only data (which won't have working file objects stringified).
+                const localRecord = serverData ? {
+                    id: serverData.emp_id,
+                    ...serverData
+                } : {
+                    id: employeeId,
+                    ...formData,
+                    is_local_only: true // Flag to show "Saved Locally" UI hint
+                };
+
+                employeeDatabase[employeeId] = localRecord;
                 localStorage.setItem(LS_DB, JSON.stringify(employeeDatabase));
 
                 // Excel data
@@ -776,14 +1021,60 @@
             document.getElementById('age').value = age;
         });
 
-        // File size validation
+        // File size validation and Preview
         const fileInputs = ['cvResume', 'idProof', 'bankPassbook', 'marksheet'];
         fileInputs.forEach(inputId => {
             document.getElementById(inputId).addEventListener('change', function (e) {
                 const file = e.target.files[0];
-                if (file && file.size > 5 * 1024 * 1024) { // 5MB limit
-                    alert('File size should not exceed 5MB. Please choose a smaller file.');
-                    e.target.value = '';
+                let previewContainer = document.getElementById(inputId + 'Preview');
+
+                // Create preview container if it doesn't exist
+                if (!previewContainer) {
+                    previewContainer = document.createElement('div');
+                    previewContainer.id = inputId + 'Preview';
+                    previewContainer.style.marginTop = '10px';
+                    previewContainer.style.padding = '10px';
+                    previewContainer.style.border = '1px solid #e0e0e0';
+                    previewContainer.style.borderRadius = '8px';
+                    previewContainer.style.display = 'none';
+                    previewContainer.style.alignItems = 'center';
+                    previewContainer.style.gap = '15px';
+                    previewContainer.style.background = '#f8f9ff';
+                    this.parentNode.appendChild(previewContainer);
+                }
+
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        alert('File size should not exceed 5MB. Please choose a smaller file.');
+                        e.target.value = '';
+                        previewContainer.style.display = 'none';
+                        return;
+                    }
+
+                    // Show Preview
+                    const fileUrl = URL.createObjectURL(file);
+                    let iconHtml = '';
+
+                    if (file.type.startsWith('image/')) {
+                        iconHtml = `<img src="${fileUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">`;
+                    } else if (file.type === 'application/pdf') {
+                        iconHtml = `<div style="width: 60px; height: 60px; background: #e74c3c; color: white; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; font-size: 20px;">PDF</div>`;
+                    } else {
+                        iconHtml = `<div style="width: 60px; height: 60px; background: #95a5a6; color: white; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; font-size: 14px;">DOC</div>`;
+                    }
+
+                    previewContainer.innerHTML = `
+                        ${iconHtml}
+                        <div style="flex: 1;">
+                            <div style="font-size: 14px; font-weight: bold; color: #333; word-break: break-all;">${file.name}</div>
+                            <div style="font-size: 12px; color: #666;">Will be safely converted to PDF</div>
+                        </div>
+                        <a href="${fileUrl}" target="_blank" style="background: #3f51b5; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold;">👁️ View</a>
+                        <a href="${fileUrl}" download="${file.name}" style="background: #4caf50; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold;">⬇️ Download</a>
+                    `;
+                    previewContainer.style.display = 'flex';
+                } else {
+                    previewContainer.style.display = 'none';
                 }
             });
         });

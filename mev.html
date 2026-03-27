@@ -342,7 +342,7 @@
 <body>
   <nav class="navbar">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <img src="assets/logo.png" alt="Mevrick Logo" style="height: 60px; width: 60px; object-fit: contain; background: white; border-radius: 50%; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <img src="assets/logo.png" alt="Mevrick Logo" style="height: 48px; width: auto; object-fit: contain;">
       <a class="logo" href="index.html">MEVTENCIA</a>
     </div>
     <ul class="nav-links">
@@ -354,7 +354,7 @@
   <div class="container">
     <div class="header-card">
       <div style="margin-bottom: 20px;">
-        <img src="assets/logo.png" alt="Mevrick Logo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: contain; background: white; padding: 10px; box-shadow: 0 8px 25px rgba(63, 81, 181, 0.3);">
+        <img src="assets/logo.png" alt="Mevrick Logo" style="width: auto; height: 80px; object-fit: contain;">
       </div>
       <h2>Camera + Location Verification</h2>
       <p>Enable your camera and GPS to capture your photo and current address for attendance verification.</p>
@@ -423,7 +423,6 @@
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
         document.getElementById('video').srcObject = stream;
         document.getElementById('videoWrap').classList.add('active');
-        document.getElementById('camIconWrap').style.display = 'none';
         document.getElementById('enableBtn').style.display = 'none';
         document.getElementById('captureBtn').style.display = 'flex';
         document.getElementById('captureBtn').classList.remove('btn-disabled');
@@ -450,6 +449,12 @@
       document.getElementById('continueBtn').style.display = 'flex';
       setStep(3);
       await fetchLocation();
+      
+      // Automatic proceed after location is found
+      showMsg('✅ Photo and location verified! Redirecting...', 'success');
+      setTimeout(() => {
+        continueToLogin();
+      }, 1500);
     }
 
     function retake() {
@@ -460,7 +465,6 @@
       document.getElementById('retakeBtn').style.display = 'none';
       document.getElementById('continueBtn').style.display = 'none';
       document.getElementById('enableBtn').style.display = 'flex';
-      document.getElementById('camIconWrap').style.display = 'inline-flex';
       document.getElementById('statusMsg').className = 'status-msg';
       setStep(1);
     }

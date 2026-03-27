@@ -82,12 +82,12 @@
 <body>
   <nav class="navbar">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <img src="assets/logo.png" alt="Mevrick Logo" style="height: 60px; width: 60px; object-fit: contain; background: white; border-radius: 50%; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <img src="assets/logo.png" alt="Mevrick Logo" style="height: 48px; width: auto; object-fit: contain;">
       <a class="logo" href="index.html">MEVTENCIA</a>
     </div>
     <ul class="nav-links">
       <li><a href="AdminDashboard.html">Attendance</a></li>
-      <li><a href="Registration.html">+ Register</a></li>
+      <li><a href="Registration.html">Register</a></li>
       <li><a href="index.html" onclick="localStorage.removeItem('mev_adminSession')">Logout</a></li>
     </ul>
   </nav>
@@ -219,6 +219,7 @@
             bank_passbook: obj.bankPassbook || obj.bank_passbook,
             marksheet: obj.marksheet || obj.marksheet,
             appointment_letter: obj.appointmentLetter || obj.appointment_letter,
+            is_local_only: obj.is_local_only,
             registered_at: obj.registered_at || new Date().toISOString()
           }));
         }
@@ -322,9 +323,12 @@
           } else if (['cv_resume', 'id_proof', 'bank_passbook', 'marksheet', 'appointment_letter'].includes(key)) {
              if (val && typeof val === 'string' && val.startsWith('/uploads/')) {
                 const docUrl = `http://127.0.0.1:3000${val}`;
-                displayVal = `<a href="${docUrl}" target="_blank" style="display: inline-block; background: #3f51b5; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 11px;">📄 View Document</a>`;
-             } else if (val && (typeof val === 'object' || (typeof val === 'string' && val.includes('[object File]')))) {
-                displayVal = `<span style="color: #666; font-style: italic;">Saved Locally (Restart server to sync)</span>`;
+                displayVal = `<div style="display:flex; gap: 5px; flex-wrap: wrap;">
+                                <a href="${docUrl}" target="_blank" style="background: #3f51b5; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 11px;">👁️ View</a>
+                                <a href="${docUrl}" download style="background: #4caf50; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 11px;">⬇️ Download</a>
+                              </div>`;
+             } else if (emp.is_local_only || (val && typeof val === 'object')) {
+                displayVal = `<div style="background: #ffebee; color: #c62828; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold;">⚠️ File Lost (Old Test Record). Delete & Re-register.</div>`;
              } else {
                 displayVal = 'N/A';
              }

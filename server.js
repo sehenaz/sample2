@@ -26,6 +26,21 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 app.use('/uploads', express.static(uploadsDir));
+app.use('/uploads', (req, res) => {
+  res.status(404).send(`
+    <html>
+    <head><title>Document Not Found</title></head>
+    <body style="font-family: 'Segoe UI', sans-serif; text-align: center; padding: 50px; background: #f5f7fa;">
+      <div style="background: white; max-width: 500px; margin: 0 auto; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h2 style="color: #c62828; margin-top: 0;">📄 Document Missing</h2>
+        <p style="color: #333;">The requested PDF file could not be found on the server.</p>
+        <p style="color: #888; font-size: 13px;">Reason: This employee was likely registered when the server was offline, or the physical file has since been deleted from the hard drive.</p>
+        <button onclick="window.close()" style="background: #3f51b5; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px;">Go Back / Close Page</button>
+      </div>
+    </body>
+    </html>
+  `);
+});
 
 // Multer Storage Configuration
 const storage = multer.diskStorage({
@@ -182,7 +197,12 @@ app.post('/api/register', upload.fields([
         return res.status(500).json({ error: err.message });
       }
       console.log(`[Registration] Success: ${emp_id} (rowId: ${this.lastID})`);
-      res.json({ message: 'Employee registered successfully', id: emp_id, rowId: this.lastID });
+      
+      // Return the full record so frontend can sync localStorage correctly
+      db.get(`SELECT * FROM employees WHERE emp_id = ?`, [emp_id], (err, row) => {
+        if (err) return res.json({ message: 'Employee registered successfully', id: emp_id });
+        res.json({ message: 'Employee registered successfully', id: emp_id, employee: row });
+      });
     }
   );
 });
