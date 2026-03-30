@@ -102,7 +102,6 @@
       background: #d32f2f;
     }
 
-    /* Stats */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -124,7 +123,6 @@
       text-align: center;
     }
 
-    /* Sandwich stat card highlighted */
     .stat-card.sandwich-stat {
       background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
       border: 2px solid #f59e0b;
@@ -165,7 +163,32 @@
       font-size: 12px;
     }
 
-    /* ── SANDWICH ALERT PANEL ── */
+    /* Debug info banner */
+    .debug-banner {
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #1565c0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .debug-banner strong {
+      font-weight: 700;
+    }
+
+    .debug-keys {
+      font-family: monospace;
+      background: #bbdefb;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
     .sandwich-panel {
       background: white;
       border-radius: 20px;
@@ -174,7 +197,6 @@
       margin-bottom: 22px;
       border-left: 5px solid #f59e0b;
       display: none;
-      /* hidden until there are cases */
     }
 
     .sandwich-panel.visible {
@@ -278,7 +300,6 @@
       margin-top: 6px;
     }
 
-    /* Filters */
     .filters {
       display: flex;
       gap: 12px;
@@ -347,7 +368,6 @@
       transform: translateY(-1px);
     }
 
-    /* Table */
     .table-container {
       background: white;
       border-radius: 20px;
@@ -406,7 +426,6 @@
       border-bottom: none;
     }
 
-    /* Highlight rows that have sandwich leave */
     tr.row-sandwich {
       background: #fffbeb !important;
     }
@@ -513,7 +532,6 @@
       color: #004085;
     }
 
-    /* Sandwich badge */
     .badge-sandwich {
       background: #fde68a;
       color: #92400e;
@@ -534,7 +552,6 @@
       font-size: 14px;
     }
 
-    /* Mobile cards */
     .mobile-list {
       display: none;
       flex-direction: column;
@@ -558,7 +575,6 @@
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     }
 
-    /* Sandwich highlight on mobile card */
     .mob-card.mob-sandwich {
       border: 2px solid #f59e0b;
       background: #fffbeb;
@@ -612,7 +628,6 @@
       margin-top: 8px;
     }
 
-    /* Photo Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -653,13 +668,12 @@
 
 <body>
   <nav class="navbar">
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <img src="assets/logo.png" alt="Mevrick Logo" style="height: 48px; width: auto; object-fit: contain;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <img src="assets/logo.png" alt="Mevrick Logo" style="height:48px;width:auto;object-fit:contain;">
       <a class="logo" href="index.html">MEVTENCIA</a>
     </div>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
-      <!-- <li><a href="AdminDashboard.html">Dashboard</a></li> -->
       <li><a href="AddEmployee.html">Add Employee</a></li>
       <li><a href="EmployeeHistory.html">Registered</a></li>
       <li><a href="index.html" onclick="adminLogout()">Logout</a></li>
@@ -684,7 +698,14 @@
       </div>
     </div>
 
-    <!-- Stats Row — now 5 cards (added Sandwich) -->
+    <!-- Debug Info Banner — shows which localStorage keys were found -->
+    <div class="debug-banner" id="debugBanner" style="display:none;">
+      ℹ️ <strong>Data Source:</strong>
+      <span id="debugText"></span>
+      <button onclick="document.getElementById('debugBanner').style.display='none'"
+        style="margin-left:auto;background:none;border:none;cursor:pointer;color:#1565c0;font-size:16px;">✕</button>
+    </div>
+
     <div class="stats-row">
       <div class="stat-card">
         <div class="num" id="statTotal">0</div>
@@ -702,30 +723,22 @@
         <div class="num blue" id="statLive">0</div>
         <div class="lbl">In Progress</div>
       </div>
-      <!-- NEW: Sandwich stat card -->
       <div class="stat-card sandwich-stat" onclick="scrollToSandwichPanel()" title="Click to view sandwich cases">
         <div class="num amber" id="statSandwich">0</div>
         <div class="lbl">🥪 Sandwich Leaves</div>
       </div>
     </div>
 
-    <!-- ── SANDWICH ALERT PANEL (shown only when cases exist) ── -->
     <div class="sandwich-panel" id="sandwichPanel">
       <div class="sandwich-panel-header">
         <div>
-          <div class="sandwich-panel-title">
-            🥪 Sandwich Leave Alert
-          </div>
-          <div class="sandwich-panel-sub">
-            These employees took leave on a working day adjacent to a weekend — extending their break.
-          </div>
+          <div class="sandwich-panel-title">🥪 Sandwich Leave Alert</div>
+          <div class="sandwich-panel-sub">These employees took leave on a working day adjacent to a weekend — extending
+            their break.</div>
         </div>
         <button class="sandwich-toggle-btn" onclick="toggleSandwichList()">▼ Show Details</button>
       </div>
-
-      <div class="sandwich-list" id="sandwichList">
-        <!-- Populated by JS -->
-      </div>
+      <div class="sandwich-list" id="sandwichList"></div>
     </div>
 
     <div class="filters">
@@ -749,7 +762,6 @@
       </button>
     </div>
 
-    <!-- Desktop Table -->
     <div class="table-container">
       <div class="table-header">
         <h3>Attendance Records</h3>
@@ -777,11 +789,9 @@
       </table>
     </div>
 
-    <!-- Mobile Cards -->
     <div class="mobile-list" id="mobileList"></div>
 
-    <!-- Payroll Table -->
-    <div class="table-container" style="margin-top: 30px;" id="payrollSection">
+    <div class="table-container" style="margin-top:30px;" id="payrollSection">
       <div class="table-header">
         <h3>Employee Monthly Payroll Summary</h3>
         <span class="record-count" id="payrollMonthLbl">—</span>
@@ -810,7 +820,6 @@
 
   </div>
 
-  <!-- Photo Modal -->
   <div class="modal-overlay" id="photoModal" onclick="closeModal()">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <img class="modal-img" id="modalImg" alt="Employee Photo" />
@@ -818,17 +827,140 @@
 
   <script>
     window.onload = function () {
-      if (!localStorage.getItem('mev_adminSession')) { window.location.href = 'AdminLogin.html'; return; }
+      if (!localStorage.getItem('mev_adminSession')) {
+        window.location.href = 'AdminLogin.html';
+        return;
+      }
       renderRecords();
       setInterval(renderRecords, 30000);
     };
 
+    /* ═══════════════════════════════════════════════════════════════
+       ALL POSSIBLE localStorage KEYS where attendance may be saved.
+       ADD any key your employee-side pages use to this array.
+    ═══════════════════════════════════════════════════════════════ */
+    const ATTENDANCE_KEYS = [
+      'mev_adminLog',           // original key (admin writes)
+      'mev_attendanceLog',      // common employee-side key
+      'mevtencia_attendance',   // alternate naming
+      'mevrick_attendance',     // brand variant
+      'attendance_records',     // generic key
+      'mev_attendance',         // short variant
+      'attendanceLog',          // camelCase variant
+      'mevtencia_attendanceLog',
+      'mev_logs',
+      'employee_attendance'
+    ];
+
+    /* ─────────────────────────────────────────────────────────────
+       Reads ALL attendance records from:
+         1. /api/attendance  (backend, if available)
+         2. ALL known localStorage keys (merged + deduplicated)
+         3. Any localStorage key whose name contains "attend" or "log"
+            (auto-discovery for unknown key names)
+    ───────────────────────────────────────────────────────────── */
     async function getAllRecords() {
+      let records = [];
+      let sourcesFound = [];
+
+      // ── 1. Try API ──
       try {
         const response = await fetch('/api/attendance');
-        if (response.ok) return await response.json();
-      } catch (e) { console.error('Fetch failed:', e); }
-      return JSON.parse(localStorage.getItem('mev_adminLog') || '[]');
+        if (response.ok) {
+          const apiData = await response.json();
+          if (Array.isArray(apiData) && apiData.length > 0) {
+            records = apiData;
+            sourcesFound.push(`API (${apiData.length} records)`);
+          }
+        }
+      } catch (e) { /* no backend — fallback to localStorage */ }
+
+      // ── 2. Scan ALL known keys ──
+      ATTENDANCE_KEYS.forEach(key => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const arr = Array.isArray(parsed) ? parsed : Object.values(parsed);
+          if (arr.length > 0) {
+            sourcesFound.push(`"${key}" (${arr.length})`);
+            records = mergeRecords(records, arr);
+          }
+        } catch (e) { /* skip malformed */ }
+      });
+
+      // ── 3. Auto-discover unknown keys ──
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          const lk = key.toLowerCase();
+          // Skip already-checked keys and non-attendance keys
+          if (ATTENDANCE_KEYS.includes(key)) continue;
+          if (!lk.includes('attend') && !lk.includes('clockin') && !lk.includes('mev_log')) continue;
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            const parsed = JSON.parse(raw);
+            const arr = Array.isArray(parsed) ? parsed : Object.values(parsed);
+            if (arr.length > 0 && arr[0] && (arr[0].emp_name || arr[0].clock_in || arr[0].emp_id)) {
+              sourcesFound.push(`auto:"${key}" (${arr.length})`);
+              records = mergeRecords(records, arr);
+            }
+          } catch (e) { /* skip */ }
+        }
+      } catch (e) { /* private browsing may restrict key enumeration */ }
+
+      // ── Show debug banner ──
+      const banner = document.getElementById('debugBanner');
+      const debugText = document.getElementById('debugText');
+      if (sourcesFound.length > 0) {
+        debugText.innerHTML = sourcesFound.map(s => `<span class="debug-keys">${s}</span>`).join(' + ');
+        banner.style.display = 'flex';
+      } else {
+        debugText.innerHTML = '<span class="debug-keys">No data found in any source</span> — check that employees are saving attendance correctly.';
+        banner.style.display = 'flex';
+      }
+
+      return records;
+    }
+
+    /* Merge two arrays, deduplicating by emp_id+date+clock_in combo */
+    function mergeRecords(base, incoming) {
+      const seen = new Set(base.map(r => dedupeKey(r)));
+      const extras = incoming.filter(r => {
+        const k = dedupeKey(r);
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      return [...base, ...extras];
+    }
+
+    function dedupeKey(r) {
+      return `${r.emp_id || r.emp_name || '?'}|${r.date || ''}|${r.clock_in || ''}`;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       Normalise a record so it always has the expected fields
+       regardless of which key it came from.
+    ───────────────────────────────────────────────────────────── */
+    function normaliseRecord(r) {
+      return {
+        emp_name: r.emp_name || r.employeeName || r.name || r.employee_name || '—',
+        emp_id: r.emp_id || r.employeeId || r.id || r.employee_id || '',
+        dept: r.dept || r.department || '',
+        city: r.city || r.location_city || '',
+        date: r.date || r.attendance_date || '',
+        clock_in: r.clock_in || r.clockIn || r.check_in || '',
+        clock_out: r.clock_out || r.clockOut || r.check_out || '',
+        work_hours: r.work_hours || r.workHours || r.hours || '',
+        location: r.location || r.address || '',
+        lat: r.lat || r.latitude || '',
+        lng: r.lng || r.longitude || '',
+        photo: r.photo || r.selfie || r.image || '',
+        attendance_type: r.attendance_type || r.attendanceType || r.type || 'In Progress',
+      };
     }
 
     function parseDate(dateStr) {
@@ -847,27 +979,8 @@
       return `<span class="status-badge badge-working">${type}</span>`;
     }
 
-    /* ────────────────────────────────────────────────
-       SANDWICH LEAVE DETECTION
-       A "sandwich" occurs when an employee's attendance
-       record falls on a working day (Mon–Fri) that is
-       directly adjacent to a weekend (Sat/Sun), AND
-       there is a gap showing the employee was absent
-       on those adjacent working days.
-
-       Logic:
-       1. Group all records by employee.
-       2. Sort each employee's attendance dates.
-       3. For each consecutive pair (d1 → d2), examine
-          the gap days between them.
-       4. If the gap contains both weekend days AND
-          working-day absences that sit right next to
-          those weekends → sandwich detected.
-       5. Mark the bordering records (d1 and d2) with
-          the sandwich flag.
-    ──────────────────────────────────────────────── */
+    /* ── Sandwich leave detection (unchanged logic) ── */
     function detectSandwichLeaves(allRecords) {
-      // Build a map: empKey → { name, id, dates: Set<"YYYY-MM-DD"> }
       const byEmp = {};
       allRecords.forEach(r => {
         const key = r.emp_id || r.emp_name || 'unknown';
@@ -876,79 +989,49 @@
         if (d) byEmp[key].dates.add(d);
       });
 
-      // sandwichKeys: Set of strings "empKey|YYYY-MM-DD" for records that border a sandwich
       const sandwichKeys = new Set();
-      // sandwichCases: array of human-readable case objects for the panel
       const sandwichCases = [];
 
       for (const [empKey, emp] of Object.entries(byEmp)) {
-        const sortedDates = Array.from(emp.dates).sort(); // lexicographic works for ISO dates
+        const sortedDates = Array.from(emp.dates).sort();
         if (sortedDates.length < 2) continue;
-
         for (let i = 0; i < sortedDates.length - 1; i++) {
           const d1 = new Date(sortedDates[i]);
           const d2 = new Date(sortedDates[i + 1]);
-          const diffDays = Math.round((d2 - d1) / 86400000); // ms → days
-
-          if (diffDays <= 1) continue; // consecutive or same day — no gap
-
-          // Collect info about every day in the gap (exclusive of d1 and d2)
+          const diffDays = Math.round((d2 - d1) / 86400000);
+          if (diffDays <= 1) continue;
           const gapDays = [];
           for (let j = 1; j < diffDays; j++) {
-            const g = new Date(d1);
-            g.setDate(g.getDate() + j);
-            const dow = g.getDay(); // 0=Sun, 6=Sat
+            const g = new Date(d1); g.setDate(g.getDate() + j);
+            const dow = g.getDay();
             gapDays.push({ date: g, isWeekend: dow === 0 || dow === 6 });
           }
-
           const hasWeekendInGap = gapDays.some(g => g.isWeekend);
           const absentWorkingDays = gapDays.filter(g => !g.isWeekend);
-
           if (!hasWeekendInGap || absentWorkingDays.length === 0) continue;
-
-          // Now check: are any of the absent working days directly adjacent to a weekend?
-          // i.e., the day before or after the absent day is a Sat or Sun.
           const trulySandwiched = absentWorkingDays.filter(({ date }) => {
             const prev = new Date(date); prev.setDate(prev.getDate() - 1);
             const next = new Date(date); next.setDate(next.getDate() + 1);
-            const prevDow = prev.getDay();
-            const nextDow = next.getDay();
-            return prevDow === 0 || prevDow === 6 || nextDow === 0 || nextDow === 6;
+            return [0, 6].includes(prev.getDay()) || [0, 6].includes(next.getDay());
           });
-
           if (trulySandwiched.length === 0) continue;
-
-          // Flag the two bordering attendance dates
           sandwichKeys.add(`${empKey}|${sortedDates[i]}`);
           sandwichKeys.add(`${empKey}|${sortedDates[i + 1]}`);
-
-          // Format absent dates for display
           const absentLabels = trulySandwiched.map(({ date }) => {
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             return `${days[date.getDay()]} ${date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`;
           });
-
-          sandwichCases.push({
-            empName: emp.name || 'Unknown',
-            empId: emp.id || '',
-            from: sortedDates[i],
-            to: sortedDates[i + 1],
-            absentLabels,
-          });
+          sandwichCases.push({ empName: emp.name || 'Unknown', empId: emp.id || '', from: sortedDates[i], to: sortedDates[i + 1], absentLabels });
         }
       }
-
       return { sandwichKeys, sandwichCases };
     }
 
-    // Helper: build the lookup key used in sandwichKeys
     function sandwichKey(r) {
       const empKey = r.emp_id || r.emp_name || 'unknown';
-      const d = parseDate(r.date);
-      return `${empKey}|${d}`;
+      return `${empKey}|${parseDate(r.date)}`;
     }
 
-    // Toggle the detail list inside the sandwich panel
     function toggleSandwichList() {
       const list = document.getElementById('sandwichList');
       const btn = document.querySelector('.sandwich-toggle-btn');
@@ -960,43 +1043,38 @@
       const panel = document.getElementById('sandwichPanel');
       if (panel.classList.contains('visible')) {
         panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Auto-open the list
-        const list = document.getElementById('sandwichList');
-        const btn = document.querySelector('.sandwich-toggle-btn');
-        list.classList.add('open');
-        btn.textContent = '▲ Hide Details';
+        document.getElementById('sandwichList').classList.add('open');
+        document.querySelector('.sandwich-toggle-btn').textContent = '▲ Hide Details';
       }
     }
 
     let lastFilteredData = [];
 
     async function renderRecords() {
-      const all = await getAllRecords();
+      const rawAll = await getAllRecords();
+      // Normalise every record so field names are consistent
+      const all = rawAll.map(normaliseRecord);
 
-      // ── Sandwich detection runs on ALL records (not filtered) ──
       const { sandwichKeys, sandwichCases } = detectSandwichLeaves(all);
 
-      // ── Populate Sandwich Panel ──
+      // ── Sandwich panel ──
       const panel = document.getElementById('sandwichPanel');
       const list = document.getElementById('sandwichList');
       document.getElementById('statSandwich').textContent = sandwichCases.length;
-
       if (sandwichCases.length > 0) {
         panel.classList.add('visible');
-        list.innerHTML = sandwichCases.map(c => {
-          const absentStr = c.absentLabels.join(', ');
-          return `<div class="sandwich-case-card">
+        list.innerHTML = sandwichCases.map(c => `
+          <div class="sandwich-case-card">
             <div class="sc-left">
               <div class="sc-name">${c.empName}</div>
               <div class="sc-id">${c.empId}</div>
               <span class="sc-tag">🥪 Sandwich Leave</span>
             </div>
             <div class="sc-right">
-              <div class="sc-absent">Absent: ${absentStr}</div>
+              <div class="sc-absent">Absent: ${c.absentLabels.join(', ')}</div>
               <div class="sc-range">Between ${c.from} → ${c.to}</div>
             </div>
-          </div>`;
-        }).join('');
+          </div>`).join('');
       } else {
         panel.classList.remove('visible');
         list.innerHTML = '';
@@ -1028,7 +1106,7 @@
       const tbody = document.getElementById('tableBody');
       if (!filtered.length) {
         tbody.innerHTML = `<tr><td colspan="9" class="empty-row" style="text-align:center;padding:40px;color:#aaa;">
-          ${all.length ? 'No records match your filters.' : 'No attendance records yet. Employees will appear here after clocking in.'}
+          ${all.length ? 'No records match your filters.' : 'No attendance records found. Make sure employees are saving to the correct localStorage key.'}
         </td></tr>`;
       } else {
         tbody.innerHTML = filtered.map(r => {
@@ -1036,15 +1114,13 @@
           const photoEl = r.photo
             ? `<img class="emp-photo" src="${r.photo}" alt="" onclick="openModal('${r.photo.replace(/'/g, "\\'")}')"/>`
             : `<div class="emp-photo-placeholder"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>`;
-          const sandwichBadge = isSandwich
-            ? `<div><span class="badge-sandwich">🥪 Sandwich Leave</span></div>`
-            : '';
+          const sandwichBadge = isSandwich ? `<div><span class="badge-sandwich">🥪 Sandwich Leave</span></div>` : '';
           return `<tr class="${isSandwich ? 'row-sandwich' : ''}">
             <td>${photoEl}</td>
             <td>
-              <div class="emp-name">${r.emp_name || '—'}</div>
-              <div class="emp-id">${r.emp_id || ''}</div>
-              <div class="emp-dept">${r.dept || ''}</div>
+              <div class="emp-name">${r.emp_name}</div>
+              <div class="emp-id">${r.emp_id}</div>
+              <div class="emp-dept">${r.dept}</div>
             </td>
             <td>${r.city || '—'}</td>
             <td>${r.date || '—'}</td>
@@ -1052,16 +1128,12 @@
             <td class="time-val">${r.clock_out || '<span style="color:#ccc">—</span>'}</td>
             <td class="time-val">${r.work_hours || '<span style="color:#ccc">—</span>'}</td>
             <td>
-              <div class="loc-val" title="${r.location || ''}">${r.location || 'Unknown'}</div>
+              <div class="loc-val" title="${r.location}">${r.location || 'Unknown'}</div>
               ${r.lat && r.lng ? `<a class="map-link" href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank">
-                <svg style="width:12px;height:12px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87,-3.13,-7,-7,-7zm0,9.5c-1.38,0,-2.5,-1.12,-2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5,-1.12,2.5,-2.5,2.5z"/></svg>
-                View Map
-              </a>` : ''}
+                <svg style="width:12px;height:12px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0,9.5c-1.38,0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5,1.12 2.5,2.5-1.12,2.5-2.5,2.5z"/></svg>
+                View Map</a>` : ''}
             </td>
-            <td>
-              ${getBadge(r.attendance_type)}
-              ${sandwichBadge}
-            </td>
+            <td>${getBadge(r.attendance_type)}${sandwichBadge}</td>
           </tr>`;
         }).join('');
       }
@@ -1083,8 +1155,8 @@
             <div class="mob-top">
               ${photoEl}
               <div class="mob-info">
-                <div class="mob-name">${r.emp_name || 'Unknown'}</div>
-                <div class="mob-meta">${r.emp_id || ''} · ${r.dept || ''} · ${r.city || ''}</div>
+                <div class="mob-name">${r.emp_name}</div>
+                <div class="mob-meta">${r.emp_id} · ${r.dept} · ${r.city}</div>
               </div>
               ${getBadge(r.attendance_type)}
             </div>
@@ -1095,14 +1167,13 @@
               <div class="mob-item"><label>Hours</label><div class="v">${r.work_hours || '—'}</div></div>
             </div>
             ${sandwichBadge}
-            <div class="mob-loc">
-              📍 ${r.location || 'Unknown location'}
+            <div class="mob-loc">📍 ${r.location || 'Unknown location'}
               ${r.lat && r.lng ? `<br/><a class="map-link" href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank" style="margin-top:8px;font-size:12px">View Exact Location on Map</a>` : ''}
             </div>
           </div>`;
         }).join('');
       }
-      
+
       renderPayroll(all);
     }
 
@@ -1114,175 +1185,141 @@
     }
 
     let allEmployeesCache = null;
+    /* ─────────────────────────────────────────────────────────────
+       Employee DB keys — same multi-key strategy
+    ───────────────────────────────────────────────────────────── */
+    const EMPLOYEE_KEYS = [
+      'mevtencia_employeeDatabase',
+      'mev_employees',
+      'mevrick_employees',
+      'employee_database',
+      'employees'
+    ];
+
+    async function getEmployees() {
+      try {
+        const res = await fetch('/api/employees');
+        if (res.ok) { const d = await res.json(); if (d.length) return d; }
+      } catch (e) { }
+      for (const key of EMPLOYEE_KEYS) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          const parsed = JSON.parse(raw);
+          const arr = Array.isArray(parsed) ? parsed : Object.values(parsed);
+          if (arr.length > 0) return arr;
+        } catch (e) { }
+      }
+      return [];
+    }
+
     async function renderPayroll(allRecords) {
       if (!allEmployeesCache) {
-        try {
-          const res = await fetch('/api/employees');
-          if (res.ok) allEmployeesCache = await res.json();
-          else allEmployeesCache = [];
-        } catch (e) {
-          const ls = JSON.parse(localStorage.getItem('mevtencia_employeeDatabase') || '{}');
-          allEmployeesCache = Object.values(ls);
-        }
+        allEmployeesCache = await getEmployees();
       }
-      
+
       const now = new Date();
       const dateVal = document.getElementById('dateFilter').value;
       let targetYear = now.getFullYear();
       let targetMonth = now.getMonth();
       if (dateVal) {
-         const parts = dateVal.split('-');
-         if(parts.length >= 2) {
-            targetYear = parseInt(parts[0]);
-            targetMonth = parseInt(parts[1]) - 1;
-         }
+        const parts = dateVal.split('-');
+        if (parts.length >= 2) { targetYear = parseInt(parts[0]); targetMonth = parseInt(parts[1]) - 1; }
       }
-      
-      document.getElementById('payrollMonthLbl').textContent = new Date(targetYear, targetMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
-      const totalMonthDays = new Date(targetYear, targetMonth + 1, 0).getDate();
-      
-      const monthRecs = allRecords.filter(r => {
-         const d = parseDate(r.date);
-         if(!d) return false;
-         return d.startsWith(`${targetYear}-${String(targetMonth+1).padStart(2,'0')}`);
-      });
-      
-      const { sandwichKeys } = detectSandwichLeaves(allRecords);
+      document.getElementById('payrollMonthLbl').textContent =
+        new Date(targetYear, targetMonth, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 
+      const totalMonthDays = new Date(targetYear, targetMonth + 1, 0).getDate();
+      const monthRecs = allRecords.filter(r => {
+        const d = parseDate(r.date);
+        return d && d.startsWith(`${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`);
+      });
+
+      const { sandwichKeys } = detectSandwichLeaves(allRecords);
       const statsMap = {};
-      
+
       allEmployeesCache.forEach(emp => {
-         const id = emp.emp_id || emp.id || emp.employeeId;
-         statsMap[id] = {
-            name: emp.employee_name || emp.employeeName || 'Unknown',
-            salary: parseInt(emp.salary) || 0,
-            presentFull: 0, presentHalf: 0, holidays: 0, absent: 0, sandwiches: 0, payableDays: 0,
-            attMap: {}
-         };
+        const id = emp.emp_id || emp.id || emp.employeeId;
+        if (!id) return;
+        statsMap[id] = {
+          name: emp.employee_name || emp.employeeName || emp.emp_name || emp.name || 'Unknown',
+          salary: parseInt(emp.salary || emp.baseSalary || 0) || 0,
+          presentFull: 0, presentHalf: 0, holidays: 0, absent: 0, sandwiches: 0, payableDays: 0, attMap: {}
+        };
       });
-      
+
       monthRecs.forEach(r => {
-         const id = r.emp_id || r.emp_name;
-         if (!statsMap[id]) {
-            statsMap[id] = {
-               name: r.emp_name || id, salary: 0,
-               presentFull: 0, presentHalf: 0, holidays: 0, absent: 0, sandwiches: 0, payableDays: 0,
-               attMap: {}
-            };
-         }
-         let day = 1;
-         if (r.date.includes('/')) day = parseInt(r.date.split('/')[0]);
-         else if (r.date.includes('-')) day = parseInt(r.date.split('-')[2]);
-         
-         statsMap[id].attMap[day] = {
-            type: r.attendance_type,
-            isSandwich: sandwichKeys.has(sandwichKey(r))
-         };
+        const id = r.emp_id || r.emp_name;
+        if (!statsMap[id]) {
+          statsMap[id] = { name: r.emp_name || id, salary: 0, presentFull: 0, presentHalf: 0, holidays: 0, absent: 0, sandwiches: 0, payableDays: 0, attMap: {} };
+        }
+        let day = 1;
+        if (r.date.includes('/')) day = parseInt(r.date.split('/')[0]);
+        else if (r.date.includes('-')) day = parseInt(r.date.split('-')[2]);
+        statsMap[id].attMap[day] = { type: r.attendance_type, isSandwich: sandwichKeys.has(sandwichKey(r)) };
       });
-      
+
       const today = new Date();
       const isCurrentMonth = (targetYear === today.getFullYear() && targetMonth === today.getMonth());
       const maxDayToCount = isCurrentMonth ? today.getDate() : totalMonthDays;
-      
+
       Object.values(statsMap).forEach(st => {
-         for (let day = 1; day <= totalMonthDays; day++) {
-             const d = new Date(targetYear, targetMonth, day);
-             const isSunday = d.getDay() === 0;
-             const record = st.attMap[day];
-             const status = record ? record.type : null;
-             
-             if (day > maxDayToCount) continue;
-             
-             if (status === 'Full Day') {
-               st.payableDays += 1;
-               st.presentFull += 1;
-             } else if (status && status.includes('Half')) {
-               st.payableDays += 0.5;
-               st.absent += 0.5;
-               st.presentHalf += 1;
-             } else if (isSunday) {
-               const satStatus = st.attMap[day - 1];
-               const monStatus = st.attMap[day + 1];
-               const satAbsent = !satStatus || satStatus.type === 'Absent';
-               const monAbsent = !monStatus || monStatus.type === 'Absent';
-               if (satAbsent && monAbsent) {
-                 st.sandwiches += 1;
-                 st.absent += 1;
-               } else {
-                 st.payableDays += 1;
-                 st.holidays += 1;
-               }
-             } else {
-               st.absent += 1;
-             }
-         }
-         
-         const dailyRate = st.salary / totalMonthDays;
-         if (isCurrentMonth) {
-            st.earnedSalary = Math.round(st.payableDays >= maxDayToCount ? (st.payableDays / maxDayToCount) * ((maxDayToCount / totalMonthDays) * st.salary) : st.payableDays * dailyRate);
-         } else {
-            st.earnedSalary = Math.round(st.payableDays * dailyRate);
-         }
+        for (let day = 1; day <= totalMonthDays; day++) {
+          const d = new Date(targetYear, targetMonth, day);
+          const isSunday = d.getDay() === 0;
+          const record = st.attMap[day];
+          const status = record ? record.type : null;
+          if (day > maxDayToCount) continue;
+          if (status === 'Full Day') { st.payableDays += 1; st.presentFull += 1; }
+          else if (status && status.includes('Half')) { st.payableDays += 0.5; st.absent += 0.5; st.presentHalf += 1; }
+          else if (isSunday) {
+            const satStatus = st.attMap[day - 1];
+            const monStatus = st.attMap[day + 1];
+            if ((!satStatus || satStatus.type === 'Absent') && (!monStatus || monStatus.type === 'Absent')) {
+              st.sandwiches += 1; st.absent += 1;
+            } else { st.payableDays += 1; st.holidays += 1; }
+          } else { st.absent += 1; }
+        }
+        const dailyRate = st.salary / totalMonthDays;
+        st.earnedSalary = Math.round(st.payableDays * dailyRate);
       });
-      
+
       const tbody = document.getElementById('payrollBody');
       const empStats = Object.values(statsMap).filter(st => st.presentFull > 0 || st.presentHalf > 0 || st.salary > 0);
-      
-      if (empStats.length === 0) {
-         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#aaa;">No data to calculate for this period.</td></tr>';
+      if (!empStats.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#aaa;">No data to calculate for this period.</td></tr>';
       } else {
-         tbody.innerHTML = empStats.map(st => {
-            return `<tr>
-               <td style="font-weight:bold;color:#333;">${st.name}</td>
-               <td>₹${st.salary.toLocaleString('en-IN')}</td>
-               <td>${totalMonthDays}</td>
-               <td style="color:#4caf50;font-weight:bold;">${st.presentFull}</td>
-               <td style="color:#ff9800;font-weight:bold;">${st.presentHalf}</td>
-               <td style="color:#e53935;font-weight:bold;">${st.absent}</td>
-               <td style="color:#f59e0b;font-weight:bold;">${st.sandwiches}</td>
-               <td style="color:#1e88e5;font-weight:bold;">${st.payableDays}</td>
-               <td style="font-size:15px;font-weight:bold;color:#4caf50;">₹${st.earnedSalary.toLocaleString('en-IN')}</td>
-            </tr>`;
-         }).join('');
+        tbody.innerHTML = empStats.map(st => `<tr>
+          <td style="font-weight:bold;color:#333;">${st.name}</td>
+          <td>₹${st.salary.toLocaleString('en-IN')}</td>
+          <td>${totalMonthDays}</td>
+          <td style="color:#4caf50;font-weight:bold;">${st.presentFull}</td>
+          <td style="color:#ff9800;font-weight:bold;">${st.presentHalf}</td>
+          <td style="color:#e53935;font-weight:bold;">${st.absent}</td>
+          <td style="color:#f59e0b;font-weight:bold;">${st.sandwiches}</td>
+          <td style="color:#1e88e5;font-weight:bold;">${st.payableDays}</td>
+          <td style="font-size:15px;font-weight:bold;color:#4caf50;">₹${st.earnedSalary.toLocaleString('en-IN')}</td>
+        </tr>`).join('');
       }
     }
 
-    function openModal(src) {
-      document.getElementById('modalImg').src = src;
-      document.getElementById('photoModal').classList.add('show');
-    }
+    function openModal(src) { document.getElementById('modalImg').src = src; document.getElementById('photoModal').classList.add('show'); }
     function closeModal() { document.getElementById('photoModal').classList.remove('show'); }
-
     function adminLogout() { localStorage.removeItem('mev_adminSession'); }
 
     function exportToCSV() {
-      if (!lastFilteredData.length) { alert("No records to export!"); return; }
-
-      const headers = ["Employee Name", "Employee ID", "Department", "City", "Date", "Clock In", "Clock Out", "Work Hours", "Location", "Status", "Sandwich Leave"];
+      if (!lastFilteredData.length) { alert('No records to export!'); return; }
+      const headers = ['Employee Name', 'Employee ID', 'Department', 'City', 'Date', 'Clock In', 'Clock Out', 'Work Hours', 'Location', 'Status'];
       const rows = lastFilteredData.map(r => [
-        `"${r.emp_name || ''}"`,
-        `"${r.emp_id || ''}"`,
-        `"${r.dept || ''}"`,
-        `"${r.city || ''}"`,
-        `"${r.date || ''}"`,
-        `"${r.clock_in || ''}"`,
-        `"${r.clock_out || ''}"`,
-        `"${r.work_hours || ''}"`,
-        `"${r.location || ''}"`,
-        `"${r.attendance_type || 'In Progress'}"`,
-        `"${r._isSandwich ? 'Yes' : 'No'}"`
+        `"${r.emp_name || ''}"`, `"${r.emp_id || ''}"`, `"${r.dept || ''}"`, `"${r.city || ''}"`,
+        `"${r.date || ''}"`, `"${r.clock_in || ''}"`, `"${r.clock_out || ''}"`,
+        `"${r.work_hours || ''}"`, `"${r.location || ''}"`, `"${r.attendance_type || 'In Progress'}"`
       ]);
-
-      let csv = "data:text/csv;charset=utf-8,"
-        + headers.join(",") + "\n"
-        + rows.map(e => e.join(",")).join("\n");
-
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csv));
-      link.setAttribute("download", `Attendance_Report_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const csv = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\n' + rows.map(e => e.join(',')).join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csv));
+      link.setAttribute('download', `Attendance_Report_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
   </script>
 </body>
